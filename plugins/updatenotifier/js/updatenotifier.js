@@ -23,14 +23,15 @@
 "use strict";
 
 var UpdateNotifier_show = false, UpdateNotifier_table;
+
 /**
  * insert content into table
  * @param {jQuery} xml plugin-XML
  */
 function updatenotifier_populate(xml) {
     var html = "";
- 
-    $("Plugins Plugin_UpdateNotifier UpdateNotifier", xml).each(function(idp) {
+
+    $("Plugins Plugin_UpdateNotifier UpdateNotifier", xml).each(function (idp) {
         var packages = "", security = "";
         packages = $("packages", this).text();
         security = $("security", this).text();
@@ -38,7 +39,7 @@ function updatenotifier_populate(xml) {
         //UpdateNotifier_table.fnAddData([packages]);
         //UpdateNotifier_table.fnAddData([security]);
 
-        html  = "  <tr>\n";
+        html = "  <tr>\n";
         html += "    <td>" + packages + " " + genlang(3, false, "UpdateNotifier") + "</td>\n";
         html += "  </tr>\n";
         html += "  <tr>\n";
@@ -99,7 +100,7 @@ function updatenotifier_request() {
     });
 }
 
-$(document).ready(function() {
+$(document).ready(function () {
     $("#footer").before(buildBlock("UpdateNotifier", 1, true));
     $("#Plugin_UpdateNotifier").css("width", "451px");
 

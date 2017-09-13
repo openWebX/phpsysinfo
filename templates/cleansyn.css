@@ -35,7 +35,7 @@ body {
     overflow: auto;
     margin: 0 auto;
     padding: 20px 20px 0 20px;
-	background-color: #111;
+    background-color: #111;
 }
 
 p {
@@ -101,7 +101,7 @@ table th {
     color: #ccc;
 }
 
-#pciTable, #ideTable, #scsiTable, #usbTable, #tbTable, #i2cTable  {
+#pciTable, #ideTable, #scsiTable, #usbTable, #tbTable, #i2cTable {
     padding: 0px 30px;
 }
 

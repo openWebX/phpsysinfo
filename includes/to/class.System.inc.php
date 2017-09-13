@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.System.inc.php 255 2009-06-17 13:39:41Z bigmichi1 $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * System TO class
  *
  * @category  PHP
@@ -23,78 +24,77 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class System
-{
+class System {
     /**
      * name of the host where phpSysInfo runs
      *
      * @var String
      */
     private $_hostname = "localhost";
-
+    
     /**
      * ip of the host where phpSysInfo runs
      *
      * @var String
      */
     private $_ip = "127.0.0.1";
-
+    
     /**
      * detailed Information about the kernel
      *
      * @var String
      */
     private $_kernel = "Unknown";
-
+    
     /**
      * name of the distribution
      *
      * @var String
      */
     private $_distribution = "Unknown";
-
+    
     /**
      * icon of the distribution (must be available in phpSysInfo)
      *
      * @var String
      */
     private $_distributionIcon = "unknown.png";
-
+    
     /**
      * detailed Information about the machine name
      *
      * @var String
      */
     private $_machine = "";
-
+    
     /**
      * time in sec how long the system is running
      *
      * @var Integer
      */
     private $_uptime = 0;
-
+    
     /**
      * count of users that are currently logged in
      *
      * @var Integer
      */
     private $_users = 0;
-
+    
     /**
      * load of the system
      *
      * @var String
      */
     private $_load = "";
-
+    
     /**
      * load of the system in percent (all cpus, if more than one)
      *
      * @var Integer
      */
     private $_loadPercent = null;
-
+    
     /**
      * array with cpu devices
      *
@@ -102,8 +102,8 @@ class System
      *
      * @var array
      */
-    private $_cpus = array();
-
+    private $_cpus = [];
+    
     /**
      * array with network devices
      *
@@ -111,8 +111,8 @@ class System
      *
      * @var array
      */
-    private $_netDevices = array();
-
+    private $_netDevices = [];
+    
     /**
      * array with pci devices
      *
@@ -120,8 +120,8 @@ class System
      *
      * @var array
      */
-    private $_pciDevices = array();
-
+    private $_pciDevices = [];
+    
     /**
      * array with ide devices
      *
@@ -129,8 +129,8 @@ class System
      *
      * @var array
      */
-    private $_ideDevices = array();
-
+    private $_ideDevices = [];
+    
     /**
      * array with scsi devices
      *
@@ -138,8 +138,8 @@ class System
      *
      * @var array
      */
-    private $_scsiDevices = array();
-
+    private $_scsiDevices = [];
+    
     /**
      * array with usb devices
      *
@@ -147,8 +147,8 @@ class System
      *
      * @var array
      */
-    private $_usbDevices = array();
-
+    private $_usbDevices = [];
+    
     /**
      * array with thunderbolt devices
      *
@@ -156,8 +156,8 @@ class System
      *
      * @var array
      */
-    private $_tbDevices = array();
-
+    private $_tbDevices = [];
+    
     /**
      * array with I2C devices
      *
@@ -165,8 +165,8 @@ class System
      *
      * @var array
      */
-    private $_i2cDevices = array();
-
+    private $_i2cDevices = [];
+    
     /**
      * array with disk devices
      *
@@ -174,50 +174,50 @@ class System
      *
      * @var array
      */
-    private $_diskDevices = array();
-
+    private $_diskDevices = [];
+    
     /**
      * free memory in bytes
      *
      * @var Integer
      */
     private $_memFree = 0;
-
+    
     /**
      * total memory in bytes
      *
      * @var Integer
      */
     private $_memTotal = 0;
-
+    
     /**
      * used memory in bytes
      *
      * @var Integer
      */
     private $_memUsed = 0;
-
+    
     /**
      * used memory by applications in bytes
      *
      * @var Integer
      */
     private $_memApplication = null;
-
+    
     /**
      * used memory for buffers in bytes
      *
      * @var Integer
      */
     private $_memBuffer = null;
-
+    
     /**
      * used memory for cache in bytes
      *
      * @var Integer
      */
     private $_memCache = null;
-
+    
     /**
      * array with swap devices
      *
@@ -225,15 +225,15 @@ class System
      *
      * @var array
      */
-    private $_swapDevices = array();
-
+    private $_swapDevices = [];
+    
     /**
      * array of types of processes
      *
      * @var array
      */
-    private $_processes = array();
-
+    private $_processes = [];
+    
     /**
      * remove duplicate Entries and Count
      *
@@ -243,9 +243,8 @@ class System
      *
      * @return array
      */
-    public static function removeDupsAndCount($arrDev)
-    {
-        $result = array();
+    public static function removeDupsAndCount ($arrDev) {
+        $result = [];
         foreach ($arrDev as $dev) {
             if (count($result) === 0) {
                 array_push($result, $dev);
@@ -263,10 +262,10 @@ class System
                 }
             }
         }
-
+        
         return $result;
     }
-
+    
     /**
      * return percent of used memory
      *
@@ -275,61 +274,14 @@ class System
      *
      * @return Integer
      */
-    public function getMemPercentUsed()
-    {
+    public function getMemPercentUsed () {
         if ($this->_memTotal > 0) {
             return round($this->_memUsed / $this->_memTotal * 100);
         } else {
             return 0;
         }
     }
-
-    /**
-     * return percent of used memory for applications
-     *
-     * @see System::_memApplication
-     * @see System::_memTotal
-     *
-     * @return Integer
-     */
-    public function getMemPercentApplication()
-    {
-        if ($this->_memApplication !== null) {
-            if (($this->_memApplication > 0) && ($this->_memTotal > 0)) {
-                return round($this->_memApplication / $this->_memTotal * 100);
-            } else {
-                return 0;
-            }
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * return percent of used memory for cache
-     *
-     * @see System::_memCache
-     * @see System::_memTotal
-     *
-     * @return Integer
-     */
-    public function getMemPercentCache()
-    {
-        if ($this->_memCache !== null) {
-            if (($this->_memCache > 0) && ($this->_memTotal > 0)) {
-                if (($this->_memApplication !== null) && ($this->_memApplication > 0)) {
-                    return round(($this->_memCache + $this->_memApplication) / $this->_memTotal * 100) - $this->getMemPercentApplication();
-                } else {
-                    return round($this->_memCache / $this->_memTotal * 100);
-                }
-            } else {
-                return 0;
-            }
-        } else {
-            return null;
-        }
-    }
-
+    
     /**
      * return percent of used memory for buffer
      *
@@ -338,8 +290,7 @@ class System
      *
      * @return Integer
      */
-    public function getMemPercentBuffer()
-    {
+    public function getMemPercentBuffer () {
         if ($this->_memBuffer !== null) {
             if (($this->_memBuffer > 0) && ($this->_memTotal > 0)) {
                 if (($this->_memCache !== null) && ($this->_memCache > 0)) {
@@ -360,7 +311,51 @@ class System
             return null;
         }
     }
-
+    
+    /**
+     * return percent of used memory for applications
+     *
+     * @see System::_memApplication
+     * @see System::_memTotal
+     *
+     * @return Integer
+     */
+    public function getMemPercentApplication () {
+        if ($this->_memApplication !== null) {
+            if (($this->_memApplication > 0) && ($this->_memTotal > 0)) {
+                return round($this->_memApplication / $this->_memTotal * 100);
+            } else {
+                return 0;
+            }
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * return percent of used memory for cache
+     *
+     * @see System::_memCache
+     * @see System::_memTotal
+     *
+     * @return Integer
+     */
+    public function getMemPercentCache () {
+        if ($this->_memCache !== null) {
+            if (($this->_memCache > 0) && ($this->_memTotal > 0)) {
+                if (($this->_memApplication !== null) && ($this->_memApplication > 0)) {
+                    return round(($this->_memCache + $this->_memApplication) / $this->_memTotal * 100) - $this->getMemPercentApplication();
+                } else {
+                    return round($this->_memCache / $this->_memTotal * 100);
+                }
+            } else {
+                return 0;
+            }
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Returns total free swap space
      *
@@ -369,64 +364,19 @@ class System
      *
      * @return Integer
      */
-    public function getSwapFree()
-    {
+    public function getSwapFree () {
         if (count($this->_swapDevices) > 0) {
             $free = 0;
             foreach ($this->_swapDevices as $dev) {
                 $free += $dev->getFree();
             }
-
+            
             return $free;
         }
-
+        
         return null;
     }
-
-    /**
-     * Returns total swap space
-     *
-     * @see System::_swapDevices
-     * @see DiskDevice::getTotal()
-     *
-     * @return Integer
-     */
-    public function getSwapTotal()
-    {
-        if (count($this->_swapDevices) > 0) {
-            $total = 0;
-            foreach ($this->_swapDevices as $dev) {
-                $total += $dev->getTotal();
-            }
-
-            return $total;
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * Returns total used swap space
-     *
-     * @see System::_swapDevices
-     * @see DiskDevice::getUsed()
-     *
-     * @return Integer
-     */
-    public function getSwapUsed()
-    {
-        if (count($this->_swapDevices) > 0) {
-            $used = 0;
-            foreach ($this->_swapDevices as $dev) {
-                $used += $dev->getUsed();
-            }
-
-            return $used;
-        } else {
-            return null;
-        }
-    }
-
+    
     /**
      * return percent of total swap space used
      *
@@ -435,8 +385,7 @@ class System
      *
      * @return Integer
      */
-    public function getSwapPercentUsed()
-    {
+    public function getSwapPercentUsed () {
         if ($this->getSwapTotal() !== null) {
             if ($this->getSwapTotal() > 0) {
                 return round($this->getSwapUsed() / $this->getSwapTotal() * 100);
@@ -447,7 +396,49 @@ class System
             return null;
         }
     }
-
+    
+    /**
+     * Returns total swap space
+     *
+     * @see System::_swapDevices
+     * @see DiskDevice::getTotal()
+     *
+     * @return Integer
+     */
+    public function getSwapTotal () {
+        if (count($this->_swapDevices) > 0) {
+            $total = 0;
+            foreach ($this->_swapDevices as $dev) {
+                $total += $dev->getTotal();
+            }
+            
+            return $total;
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Returns total used swap space
+     *
+     * @see System::_swapDevices
+     * @see DiskDevice::getUsed()
+     *
+     * @return Integer
+     */
+    public function getSwapUsed () {
+        if (count($this->_swapDevices) > 0) {
+            $used = 0;
+            foreach ($this->_swapDevices as $dev) {
+                $used += $dev->getUsed();
+            }
+            
+            return $used;
+        } else {
+            return null;
+        }
+    }
+    
     /**
      * Returns $_distribution.
      *
@@ -455,11 +446,10 @@ class System
      *
      * @return String
      */
-    public function getDistribution()
-    {
+    public function getDistribution () {
         return $this->_distribution;
     }
-
+    
     /**
      * Sets $_distribution.
      *
@@ -469,11 +459,10 @@ class System
      *
      * @return Void
      */
-    public function setDistribution($distribution)
-    {
+    public function setDistribution ($distribution) {
         $this->_distribution = $distribution;
     }
-
+    
     /**
      * Returns $_distributionIcon.
      *
@@ -481,11 +470,10 @@ class System
      *
      * @return String
      */
-    public function getDistributionIcon()
-    {
+    public function getDistributionIcon () {
         return $this->_distributionIcon;
     }
-
+    
     /**
      * Sets $_distributionIcon.
      *
@@ -495,11 +483,10 @@ class System
      *
      * @return Void
      */
-    public function setDistributionIcon($distributionIcon)
-    {
+    public function setDistributionIcon ($distributionIcon) {
         $this->_distributionIcon = $distributionIcon;
     }
-
+    
     /**
      * Returns $_hostname.
      *
@@ -507,11 +494,10 @@ class System
      *
      * @return String
      */
-    public function getHostname()
-    {
+    public function getHostname () {
         return $this->_hostname;
     }
-
+    
     /**
      * Sets $_hostname.
      *
@@ -521,11 +507,10 @@ class System
      *
      * @return Void
      */
-    public function setHostname($hostname)
-    {
+    public function setHostname ($hostname) {
         $this->_hostname = $hostname;
     }
-
+    
     /**
      * Returns $_ip.
      *
@@ -533,11 +518,10 @@ class System
      *
      * @return String
      */
-    public function getIp()
-    {
+    public function getIp () {
         return $this->_ip;
     }
-
+    
     /**
      * Sets $_ip.
      *
@@ -547,11 +531,10 @@ class System
      *
      * @return Void
      */
-    public function setIp($ip)
-    {
+    public function setIp ($ip) {
         $this->_ip = $ip;
     }
-
+    
     /**
      * Returns $_kernel.
      *
@@ -559,11 +542,10 @@ class System
      *
      * @return String
      */
-    public function getKernel()
-    {
+    public function getKernel () {
         return $this->_kernel;
     }
-
+    
     /**
      * Sets $_kernel.
      *
@@ -573,11 +555,10 @@ class System
      *
      * @return Void
      */
-    public function setKernel($kernel)
-    {
+    public function setKernel ($kernel) {
         $this->_kernel = $kernel;
     }
-
+    
     /**
      * Returns $_load.
      *
@@ -585,11 +566,10 @@ class System
      *
      * @return String
      */
-    public function getLoad()
-    {
+    public function getLoad () {
         return $this->_load;
     }
-
+    
     /**
      * Sets $_load.
      *
@@ -599,11 +579,10 @@ class System
      *
      * @return Void
      */
-    public function setLoad($load)
-    {
+    public function setLoad ($load) {
         $this->_load = $load;
     }
-
+    
     /**
      * Returns $_loadPercent.
      *
@@ -611,11 +590,10 @@ class System
      *
      * @return Integer
      */
-    public function getLoadPercent()
-    {
+    public function getLoadPercent () {
         return $this->_loadPercent;
     }
-
+    
     /**
      * Sets $_loadPercent.
      *
@@ -625,11 +603,10 @@ class System
      *
      * @return Void
      */
-    public function setLoadPercent($loadPercent)
-    {
+    public function setLoadPercent ($loadPercent) {
         $this->_loadPercent = $loadPercent;
     }
-
+    
     /**
      * Returns $_machine.
      *
@@ -637,11 +614,10 @@ class System
      *
      * @return String
      */
-    public function getMachine()
-    {
+    public function getMachine () {
         return $this->_machine;
     }
-
+    
     /**
      * Sets $_machine.
      *
@@ -651,11 +627,10 @@ class System
      *
      * @return Void
      */
-    public function setMachine($machine)
-    {
+    public function setMachine ($machine) {
         $this->_machine = $machine;
     }
-
+    
     /**
      * Returns $_uptime.
      *
@@ -663,11 +638,10 @@ class System
      *
      * @return Integer
      */
-    public function getUptime()
-    {
+    public function getUptime () {
         return $this->_uptime;
     }
-
+    
     /**
      * Sets $_uptime.
      *
@@ -677,11 +651,10 @@ class System
      *
      * @return Void
      */
-    public function setUptime($uptime)
-    {
+    public function setUptime ($uptime) {
         $this->_uptime = $uptime;
     }
-
+    
     /**
      * Returns $_users.
      *
@@ -689,11 +662,10 @@ class System
      *
      * @return Integer
      */
-    public function getUsers()
-    {
+    public function getUsers () {
         return $this->_users;
     }
-
+    
     /**
      * Sets $_users.
      *
@@ -703,11 +675,10 @@ class System
      *
      * @return Void
      */
-    public function setUsers($users)
-    {
+    public function setUsers ($users) {
         $this->_users = $users;
     }
-
+    
     /**
      * Returns $_cpus.
      *
@@ -715,11 +686,10 @@ class System
      *
      * @return array
      */
-    public function getCpus()
-    {
+    public function getCpus () {
         return $this->_cpus;
     }
-
+    
     /**
      * Sets $_cpus.
      *
@@ -730,11 +700,10 @@ class System
      *
      * @return Void
      */
-    public function setCpus($cpus)
-    {
+    public function setCpus ($cpus) {
         array_push($this->_cpus, $cpus);
     }
-
+    
     /**
      * Returns $_netDevices.
      *
@@ -742,11 +711,10 @@ class System
      *
      * @return array
      */
-    public function getNetDevices()
-    {
+    public function getNetDevices () {
         return $this->_netDevices;
     }
-
+    
     /**
      * Sets $_netDevices.
      *
@@ -757,11 +725,10 @@ class System
      *
      * @return Void
      */
-    public function setNetDevices($netDevices)
-    {
+    public function setNetDevices ($netDevices) {
         array_push($this->_netDevices, $netDevices);
     }
-
+    
     /**
      * Returns $_pciDevices.
      *
@@ -769,11 +736,10 @@ class System
      *
      * @return array
      */
-    public function getPciDevices()
-    {
+    public function getPciDevices () {
         return $this->_pciDevices;
     }
-
+    
     /**
      * Sets $_pciDevices.
      *
@@ -784,11 +750,10 @@ class System
      *
      * @return Void
      */
-    public function setPciDevices($pciDevices)
-    {
+    public function setPciDevices ($pciDevices) {
         array_push($this->_pciDevices, $pciDevices);
     }
-
+    
     /**
      * Returns $_ideDevices.
      *
@@ -796,11 +761,10 @@ class System
      *
      * @return array
      */
-    public function getIdeDevices()
-    {
+    public function getIdeDevices () {
         return $this->_ideDevices;
     }
-
+    
     /**
      * Sets $_ideDevices.
      *
@@ -811,11 +775,10 @@ class System
      *
      * @return Void
      */
-    public function setIdeDevices($ideDevices)
-    {
+    public function setIdeDevices ($ideDevices) {
         array_push($this->_ideDevices, $ideDevices);
     }
-
+    
     /**
      * Returns $_scsiDevices.
      *
@@ -823,11 +786,10 @@ class System
      *
      * @return array
      */
-    public function getScsiDevices()
-    {
+    public function getScsiDevices () {
         return $this->_scsiDevices;
     }
-
+    
     /**
      * Sets $_scsiDevices.
      *
@@ -838,11 +800,10 @@ class System
      *
      * @return Void
      */
-    public function setScsiDevices($scsiDevices)
-    {
+    public function setScsiDevices ($scsiDevices) {
         array_push($this->_scsiDevices, $scsiDevices);
     }
-
+    
     /**
      * Returns $_usbDevices.
      *
@@ -850,11 +811,10 @@ class System
      *
      * @return array
      */
-    public function getUsbDevices()
-    {
+    public function getUsbDevices () {
         return $this->_usbDevices;
     }
-
+    
     /**
      * Sets $_usbDevices.
      *
@@ -865,11 +825,10 @@ class System
      *
      * @return Void
      */
-    public function setUsbDevices($usbDevices)
-    {
+    public function setUsbDevices ($usbDevices) {
         array_push($this->_usbDevices, $usbDevices);
     }
-
+    
     /**
      * Returns $_tbDevices.
      *
@@ -877,11 +836,10 @@ class System
      *
      * @return array
      */
-    public function getTbDevices()
-    {
+    public function getTbDevices () {
         return $this->_tbDevices;
     }
-
+    
     /**
      * Sets $_tbDevices.
      *
@@ -892,11 +850,10 @@ class System
      *
      * @return Void
      */
-    public function setTbDevices($tbDevices)
-    {
+    public function setTbDevices ($tbDevices) {
         array_push($this->_tbDevices, $tbDevices);
     }
-
+    
     /**
      * Returns $_i2cDevices.
      *
@@ -904,11 +861,10 @@ class System
      *
      * @return array
      */
-    public function getI2cDevices()
-    {
+    public function getI2cDevices () {
         return $this->_i2cDevices;
     }
-
+    
     /**
      * Sets $_i2cDevices.
      *
@@ -919,11 +875,10 @@ class System
      *
      * @return Void
      */
-    public function setI2cDevices($i2cDevices)
-    {
+    public function setI2cDevices ($i2cDevices) {
         array_push($this->_i2cDevices, $i2cDevices);
     }
-
+    
     /**
      * Returns $_diskDevices.
      *
@@ -931,11 +886,10 @@ class System
      *
      * @return array
      */
-    public function getDiskDevices()
-    {
+    public function getDiskDevices () {
         return $this->_diskDevices;
     }
-
+    
     /**
      * Sets $_diskDevices.
      *
@@ -946,11 +900,10 @@ class System
      *
      * @return void
      */
-    public function setDiskDevices($diskDevices)
-    {
+    public function setDiskDevices ($diskDevices) {
         array_push($this->_diskDevices, $diskDevices);
     }
-
+    
     /**
      * Returns $_memApplication.
      *
@@ -958,11 +911,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemApplication()
-    {
+    public function getMemApplication () {
         return $this->_memApplication;
     }
-
+    
     /**
      * Sets $_memApplication.
      *
@@ -972,11 +924,10 @@ class System
      *
      * @return Void
      */
-    public function setMemApplication($memApplication)
-    {
+    public function setMemApplication ($memApplication) {
         $this->_memApplication = $memApplication;
     }
-
+    
     /**
      * Returns $_memBuffer.
      *
@@ -984,11 +935,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemBuffer()
-    {
+    public function getMemBuffer () {
         return $this->_memBuffer;
     }
-
+    
     /**
      * Sets $_memBuffer.
      *
@@ -998,11 +948,10 @@ class System
      *
      * @return Void
      */
-    public function setMemBuffer($memBuffer)
-    {
+    public function setMemBuffer ($memBuffer) {
         $this->_memBuffer = $memBuffer;
     }
-
+    
     /**
      * Returns $_memCache.
      *
@@ -1010,11 +959,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemCache()
-    {
+    public function getMemCache () {
         return $this->_memCache;
     }
-
+    
     /**
      * Sets $_memCache.
      *
@@ -1024,11 +972,10 @@ class System
      *
      * @return Void
      */
-    public function setMemCache($memCache)
-    {
+    public function setMemCache ($memCache) {
         $this->_memCache = $memCache;
     }
-
+    
     /**
      * Returns $_memFree.
      *
@@ -1036,11 +983,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemFree()
-    {
+    public function getMemFree () {
         return $this->_memFree;
     }
-
+    
     /**
      * Sets $_memFree.
      *
@@ -1050,11 +996,10 @@ class System
      *
      * @return Void
      */
-    public function setMemFree($memFree)
-    {
+    public function setMemFree ($memFree) {
         $this->_memFree = $memFree;
     }
-
+    
     /**
      * Returns $_memTotal.
      *
@@ -1062,11 +1007,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemTotal()
-    {
+    public function getMemTotal () {
         return $this->_memTotal;
     }
-
+    
     /**
      * Sets $_memTotal.
      *
@@ -1076,11 +1020,10 @@ class System
      *
      * @return Void
      */
-    public function setMemTotal($memTotal)
-    {
+    public function setMemTotal ($memTotal) {
         $this->_memTotal = $memTotal;
     }
-
+    
     /**
      * Returns $_memUsed.
      *
@@ -1088,11 +1031,10 @@ class System
      *
      * @return Integer
      */
-    public function getMemUsed()
-    {
+    public function getMemUsed () {
         return $this->_memUsed;
     }
-
+    
     /**
      * Sets $_memUsed.
      *
@@ -1102,11 +1044,10 @@ class System
      *
      * @return Void
      */
-    public function setMemUsed($memUsed)
-    {
+    public function setMemUsed ($memUsed) {
         $this->_memUsed = $memUsed;
     }
-
+    
     /**
      * Returns $_swapDevices.
      *
@@ -1114,11 +1055,10 @@ class System
      *
      * @return array
      */
-    public function getSwapDevices()
-    {
+    public function getSwapDevices () {
         return $this->_swapDevices;
     }
-
+    
     /**
      * Sets $_swapDevices.
      *
@@ -1129,11 +1069,10 @@ class System
      *
      * @return Void
      */
-    public function setSwapDevices($swapDevices)
-    {
+    public function setSwapDevices ($swapDevices) {
         array_push($this->_swapDevices, $swapDevices);
     }
-
+    
     /**
      * Returns $_processes.
      *
@@ -1141,11 +1080,10 @@ class System
      *
      * @return array
      */
-    public function getProcesses()
-    {
+    public function getProcesses () {
         return $this->_processes;
     }
-
+    
     /**
      * Sets $_proceses.
      *
@@ -1155,13 +1093,12 @@ class System
      *
      * @return Void
      */
-    public function setProcesses($processes)
-    {
+    public function setProcesses ($processes) {
         $this->_processes = $processes;
-/*
-        foreach ($processes as $proc_type=>$proc_count) {
-            $this->_processes[$proc_type] = $proc_count;
-        }
-*/
+        /*
+                foreach ($processes as $proc_type=>$proc_count) {
+                    $this->_processes[$proc_type] = $proc_count;
+                }
+        */
     }
 }

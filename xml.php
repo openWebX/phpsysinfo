@@ -14,7 +14,7 @@ header('Access-Control-Allow-Origin: *');
  * @link      http://phpsysinfo.sourceforge.net
  */
 
- /**
+/**
  * application root path
  *
  * @var string
@@ -29,16 +29,16 @@ define('APP_ROOT', dirname(__FILE__));
  */
 define('PSI_INTERNAL_XML', true);
 
-require_once APP_ROOT.'/includes/autoloader.inc.php';
+require_once APP_ROOT . '/includes/autoloader.inc.php';
 
 if ((isset($_GET['json']) || isset($_GET['jsonp'])) && !extension_loaded("json")) {
     echo '<Error Message="The json extension to php required!" Function="ERROR"/>';
 } else {
     // check what xml part should be generated
     if (isset($_GET['plugin'])) {
-        if ((trim($_GET['plugin'])!=="") && !preg_match('/[^A-Za-z]/', $_GET['plugin'])) {
+        if ((trim($_GET['plugin']) !== "") && !preg_match('/[^A-Za-z]/', $_GET['plugin'])) {
             $plugin = strtolower($_GET['plugin']);
-            $validblocks = array('vitals','hardware','memory','filesystem','network','voltage','current','temperature','fans','power','other','ups');
+            $validblocks = ['vitals', 'hardware', 'memory', 'filesystem', 'network', 'voltage', 'current', 'temperature', 'fans', 'power', 'other', 'ups'];
             if (in_array($plugin, $validblocks)) {
                 define('PSI_ONLY', $plugin);
                 $output = new WebpageXML(false);
@@ -61,7 +61,7 @@ if ((isset($_GET['json']) || isset($_GET['jsonp'])) && !extension_loaded("json")
             } else {
                 $json = json_encode(simplexml_load_string($output->getXMLString()));
             }
-            echo isset($_GET['jsonp']) ? (!preg_match('/[^A-Za-z0-9_\?]/', $_GET['callback'])?$_GET['callback']:'') . '('.$json.')' : $json;
+            echo isset($_GET['jsonp']) ? (!preg_match('/[^A-Za-z0-9_\?]/', $_GET['callback']) ? $_GET['callback'] : '') . '(' . $json . ')' : $json;
         } else {
             $output->run();
         }

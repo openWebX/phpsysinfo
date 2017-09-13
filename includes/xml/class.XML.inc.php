@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.XML.inc.php 699 2012-09-15 11:57:13Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * class for generation of the xml
  *
  * @category  PHP
@@ -23,75 +24,73 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class XML
-{
+class XML {
     /**
      * Sysinfo object where the information retrieval methods are included
      *
      * @var PSI_Interface_OS
      */
     private $_sysinfo;
-
+    
     /**
      * @var System
      */
     private $_sys = null;
-
+    
     /**
      * xml object with the xml content
      *
      * @var SimpleXMLExtended
      */
     private $_xml;
-
+    
     /**
      * object for error handling
      *
      * @var PSI_Error
      */
     private $_errors;
-
+    
     /**
      * array with all enabled plugins (name)
      *
      * @var array
      */
     private $_plugins;
-
+    
     /**
      * plugin name if pluginrequest
      *
      * @var string
      */
     private $_plugin = '';
-
+    
     /**
      * generate a xml for a plugin or for the main app
      *
      * @var boolean
      */
     private $_plugin_request = false;
-
+    
     /**
      * generate the entire xml with all plugins or only a part of the xml (main or plugin)
      *
      * @var boolean
      */
     private $_complete_request = false;
-
+    
     /**
      * doing some initial tasks
      * - generate the xml structure with the right header elements
      * - get the error object for error output
      * - get a instance of the sysinfo object
      *
-     * @param boolean $complete   generate xml with all plugins or not
+     * @param boolean $complete generate xml with all plugins or not
      * @param string  $pluginname name of the plugin
      *
      * @return void
      */
-    public function __construct($complete = false, $pluginname = "")
-    {
+    public function __construct ($complete = false, $pluginname = "") {
         $this->_errors = PSI_Error::singleton();
         if ($pluginname == "") {
             $this->_plugin_request = false;
@@ -110,14 +109,134 @@ class XML
         $this->_plugins = CommonFunctions::getPlugins();
         $this->_xmlbody();
     }
-
+    
+    /**
+     * build the xml structure where the content can be inserted
+     *
+     * @return void
+     */
+    private function _xmlbody () {
+        $dom = new DOMDocument('1.0', 'UTF-8');
+        $root = $dom->createElement("tns:phpsysinfo");
+        $root->setAttribute('xmlns:tns', 'http://phpsysinfo.sourceforge.net/');
+        $root->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+        $root->setAttribute('xsi:schemaLocation', 'http://phpsysinfo.sourceforge.net/ phpsysinfo3.xsd');
+        $dom->appendChild($root);
+        $this->_xml = new SimpleXMLExtended(simplexml_import_dom($dom), $this->_sysinfo->getEncoding());
+        
+        $generation = $this->_xml->addChild('Generation');
+        $generation->addAttribute('version', PSI_VERSION_STRING);
+        $generation->addAttribute('timestamp', time());
+        $options = $this->_xml->addChild('Options');
+        $options->addAttribute('tempFormat', defined('PSI_TEMP_FORMAT') ? strtolower(PSI_TEMP_FORMAT) : 'c');
+        $options->addAttribute('byteFormat', defined('PSI_BYTE_FORMAT') ? strtolower(PSI_BYTE_FORMAT) : 'auto_binary');
+        $options->addAttribute('datetimeFormat', defined('PSI_DATETIME_FORMAT') ? strtolower(PSI_DATETIME_FORMAT) : 'utc');
+        if (defined('PSI_REFRESH')) {
+            if (PSI_REFRESH === false) {
+                $options->addAttribute('refresh', 0);
+            } elseif (PSI_REFRESH === true) {
+                $options->addAttribute('refresh', 1);
+            } else {
+                $options->addAttribute('refresh', PSI_REFRESH);
+            }
+        } else {
+            $options->addAttribute('refresh', 60000);
+        }
+        if (defined('PSI_FS_USAGE_THRESHOLD')) {
+            if (PSI_FS_USAGE_THRESHOLD === true) {
+                $options->addAttribute('threshold', 1);
+            } elseif ((PSI_FS_USAGE_THRESHOLD !== false) && (PSI_FS_USAGE_THRESHOLD >= 1) && (PSI_FS_USAGE_THRESHOLD <= 99)) {
+                $options->addAttribute('threshold', PSI_FS_USAGE_THRESHOLD);
+            }
+        } else {
+            $options->addAttribute('threshold', 90);
+        }
+        if (count($this->_plugins) > 0) {
+            if ($this->_plugin_request) {
+                $plug = $this->_xml->addChild('UsedPlugins');
+                $plug->addChild('Plugin')->addAttribute('name', $this->_plugin);
+            } elseif ($this->_complete_request) {
+                $plug = $this->_xml->addChild('UsedPlugins');
+                foreach ($this->_plugins as $plugin) {
+                    $plug->addChild('Plugin')->addAttribute('name', $plugin);
+                }
+                /*
+                            } else {
+                                $plug = $this->_xml->addChild('UnusedPlugins');
+                                foreach ($this->_plugins as $plugin) {
+                                    $plug->addChild('Plugin')->addAttribute('name', $plugin);
+                                }
+                */
+            }
+        }
+    }
+    
+    /**
+     * get the xml object
+     *
+     * @return SimpleXmlElement
+     */
+    public function getXml () {
+        $this->_buildXml();
+        
+        return $this->_xml->getSimpleXmlElement();
+    }
+    
+    /**
+     * generate the xml document
+     *
+     * @return void
+     */
+    private function _buildXml () {
+        if (!$this->_plugin_request || $this->_complete_request) {
+            if ($this->_sys === null) {
+                if (PSI_DEBUG === true) {
+                    // unstable version check
+                    if (!is_numeric(substr(PSI_VERSION, -1))) {
+                        $this->_errors->addError("WARN", "This is an unstable version of phpSysInfo, some things may not work correctly");
+                    }
+                    
+                    // Safe mode check
+                    $safe_mode = @ini_get("safe_mode") ? true : false;
+                    if ($safe_mode) {
+                        $this->_errors->addError("WARN", "PhpSysInfo requires to set off 'safe_mode' in 'php.ini'");
+                    }
+                    // Include path check
+                    $include_path = @ini_get("include_path");
+                    if ($include_path && ($include_path != "")) {
+                        $include_path = preg_replace("/(:)|(;)/", "\n", $include_path);
+                        if (preg_match("/^\.$/m", $include_path)) {
+                            $include_path = ".";
+                        }
+                    }
+                    if ($include_path != ".") {
+                        $this->_errors->addError("WARN", "PhpSysInfo requires '.' inside the 'include_path' in php.ini");
+                    }
+                    // popen mode check
+                    if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
+                        $this->_errors->addError("WARN", "Installed version of PHP does not support proc_open() function, popen() is used");
+                    }
+                }
+                $this->_sys = $this->_sysinfo->getSys();
+            }
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'vitals') $this->_buildVitals();
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'network') $this->_buildNetwork();
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'hardware') $this->_buildHardware();
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'memory') $this->_buildMemory();
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'filesystem') $this->_buildFilesystems();
+            if (!defined('PSI_ONLY') || in_array(PSI_ONLY, ['voltage', 'current', 'temperature', 'fans', 'power', 'other'])) $this->_buildMbinfo();
+            if (!defined('PSI_ONLY') || PSI_ONLY === 'ups') $this->_buildUpsinfo();
+        }
+        if (!defined('PSI_ONLY')) $this->_buildPlugins();
+        $this->_xml->combinexml($this->_errors->errorsAddToXML($this->_sysinfo->getEncoding()));
+    }
+    
     /**
      * generate common information
      *
      * @return void
      */
-    private function _buildVitals()
-    {
+    private function _buildVitals () {
         $vitals = $this->_xml->addChild('Vitals');
         $vitals->addAttribute('Hostname', $this->_sys->getHostname());
         $vitals->addAttribute('IPAddr', $this->_sys->getIp());
@@ -136,7 +255,7 @@ class XML
         if ($this->_sysinfo->getEncoding() !== null) {
             $vitals->addAttribute('CodePage', $this->_sysinfo->getEncoding());
         }
-
+        
         //processes
         if (($procss = $this->_sys->getProcesses()) !== null) {
             if (isset($procss['*']) && (($procall = $procss['*']) > 0)) {
@@ -171,22 +290,21 @@ class XML
         }
         $vitals->addAttribute('OS', PSI_OS);
     }
-
+    
     /**
      * generate the network information
      *
      * @return void
      */
-    private function _buildNetwork()
-    {
-        $hideDevices = array();
+    private function _buildNetwork () {
+        $hideDevices = [];
         $network = $this->_xml->addChild('Network');
         if (defined('PSI_HIDE_NETWORK_INTERFACE')) {
             if (is_string(PSI_HIDE_NETWORK_INTERFACE)) {
                 if (preg_match(ARRAY_EXP, PSI_HIDE_NETWORK_INTERFACE)) {
                     $hideDevices = eval(PSI_HIDE_NETWORK_INTERFACE);
                 } else {
-                    $hideDevices = array(PSI_HIDE_NETWORK_INTERFACE);
+                    $hideDevices = [PSI_HIDE_NETWORK_INTERFACE];
                 }
             } elseif (PSI_HIDE_NETWORK_INTERFACE === true) {
                 return;
@@ -205,14 +323,13 @@ class XML
             }
         }
     }
-
+    
     /**
      * generate the hardware information
      *
      * @return void
      */
-    private function _buildHardware()
-    {
+    private function _buildHardware () {
         $hardware = $this->_xml->addChild('Hardware');
         if ($this->_sys->getMachine() != "") {
             $hardware->addAttribute('Name', $this->_sys->getMachine());
@@ -265,7 +382,7 @@ class XML
             $tmp->addAttribute('Name', $dev->getName());
             $tmp->addAttribute('Count', $dev->getCount());
         }
-
+        
         $cpu = null;
         foreach ($this->_sys->getCpus() as $oneCpu) {
             if ($cpu === null) $cpu = $hardware->addChild('CPU');
@@ -280,11 +397,11 @@ class XML
             if ($oneCpu->getCpuSpeedMin() !== 0) {
                 $tmp->addAttribute('CpuSpeedMin', $oneCpu->getCpuSpeedMin());
             }
-/*
-            if ($oneCpu->getTemp() !== null) {
-                $tmp->addAttribute('CpuTemp', $oneCpu->getTemp());
-            }
-*/
+            /*
+                        if ($oneCpu->getTemp() !== null) {
+                            $tmp->addAttribute('CpuTemp', $oneCpu->getTemp());
+                        }
+            */
             if ($oneCpu->getBusSpeed() !== null) {
                 $tmp->addAttribute('BusSpeed', $oneCpu->getBusSpeed());
             }
@@ -302,14 +419,13 @@ class XML
             }
         }
     }
-
+    
     /**
      * generate the memory information
      *
      * @return void
      */
-    private function _buildMemory()
-    {
+    private function _buildMemory () {
         $memory = $this->_xml->addChild('Memory');
         $memory->addAttribute('Free', $this->_sys->getMemFree());
         $memory->addAttribute('Used', $this->_sys->getMemUsed());
@@ -343,20 +459,19 @@ class XML
             }
         }
     }
-
+    
     /**
      * fill a xml element with atrributes from a disk device
      *
      * @param SimpleXmlExtended $mount Xml-Element
-     * @param DiskDevice        $dev   DiskDevice
-     * @param Integer           $i     counter
+     * @param DiskDevice        $dev DiskDevice
+     * @param Integer           $i counter
      *
      * @return Void
      */
-    private function _fillDevice(SimpleXMLExtended $mount, DiskDevice $dev, $i)
-    {
+    private function _fillDevice (SimpleXMLExtended $mount, DiskDevice $dev, $i) {
         $mount->addAttribute('MountPointID', $i);
-        if ($dev->getFsType()!=="") $mount->addAttribute('FSType', $dev->getFsType());
+        if ($dev->getFsType() !== "") $mount->addAttribute('FSType', $dev->getFsType());
         $mount->addAttribute('Name', $dev->getName());
         $mount->addAttribute('Free', sprintf("%.0f", $dev->getFree()));
         $mount->addAttribute('Used', sprintf("%.0f", $dev->getUsed()));
@@ -374,28 +489,27 @@ class XML
             $mount->addAttribute('MountPoint', $dev->getMountPoint());
         }
     }
-
+    
     /**
      * generate the filesysteminformation
      *
      * @return void
      */
-    private function _buildFilesystems()
-    {
-        $hideMounts = $hideFstypes = $hideDisks = array();
+    private function _buildFilesystems () {
+        $hideMounts = $hideFstypes = $hideDisks = [];
         $i = 1;
         if (defined('PSI_HIDE_MOUNTS') && is_string(PSI_HIDE_MOUNTS)) {
             if (preg_match(ARRAY_EXP, PSI_HIDE_MOUNTS)) {
                 $hideMounts = eval(PSI_HIDE_MOUNTS);
             } else {
-                $hideMounts = array(PSI_HIDE_MOUNTS);
+                $hideMounts = [PSI_HIDE_MOUNTS];
             }
         }
         if (defined('PSI_HIDE_FS_TYPES') && is_string(PSI_HIDE_FS_TYPES)) {
             if (preg_match(ARRAY_EXP, PSI_HIDE_FS_TYPES)) {
                 $hideFstypes = eval(PSI_HIDE_FS_TYPES);
             } else {
-                $hideFstypes = array(PSI_HIDE_FS_TYPES);
+                $hideFstypes = [PSI_HIDE_FS_TYPES];
             }
         }
         if (defined('PSI_HIDE_DISKS')) {
@@ -403,7 +517,7 @@ class XML
                 if (preg_match(ARRAY_EXP, PSI_HIDE_DISKS)) {
                     $hideDisks = eval(PSI_HIDE_DISKS);
                 } else {
-                    $hideDisks = array(PSI_HIDE_DISKS);
+                    $hideDisks = [PSI_HIDE_DISKS];
                 }
             } elseif (PSI_HIDE_DISKS === true) {
                 return;
@@ -417,23 +531,22 @@ class XML
             }
         }
     }
-
+    
     /**
      * generate the motherboard information
      *
      * @return void
      */
-    private function _buildMbinfo()
-    {
+    private function _buildMbinfo () {
         $mbinfo = $this->_xml->addChild('MBInfo');
         $temp = $fan = $volt = $power = $current = $other = null;
-
-        if (sizeof(unserialize(PSI_MBINFO))>0) {
+        
+        if (sizeof(unserialize(PSI_MBINFO)) > 0) {
             foreach (unserialize(PSI_MBINFO) as $mbinfoclass) {
                 $mbinfo_data = new $mbinfoclass();
                 $mbinfo_detail = $mbinfo_data->getMBInfo();
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='temperature') foreach ($mbinfo_detail->getMbTemp() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'temperature') foreach ($mbinfo_detail->getMbTemp() as $dev) {
                     if ($temp == null) {
                         $temp = $mbinfo->addChild('Temperature');
                     }
@@ -447,8 +560,8 @@ class XML
                         $item->addAttribute('Event', $dev->getEvent());
                     }
                 }
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='fans') foreach ($mbinfo_detail->getMbFan() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'fans') foreach ($mbinfo_detail->getMbFan() as $dev) {
                     if ($fan == null) {
                         $fan = $mbinfo->addChild('Fans');
                     }
@@ -462,8 +575,8 @@ class XML
                         $item->addAttribute('Event', $dev->getEvent());
                     }
                 }
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='voltage') foreach ($mbinfo_detail->getMbVolt() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'voltage') foreach ($mbinfo_detail->getMbVolt() as $dev) {
                     if ($volt == null) {
                         $volt = $mbinfo->addChild('Voltage');
                     }
@@ -480,8 +593,8 @@ class XML
                         $item->addAttribute('Event', $dev->getEvent());
                     }
                 }
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='power') foreach ($mbinfo_detail->getMbPower() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'power') foreach ($mbinfo_detail->getMbPower() as $dev) {
                     if ($power == null) {
                         $power = $mbinfo->addChild('Power');
                     }
@@ -495,8 +608,8 @@ class XML
                         $item->addAttribute('Event', $dev->getEvent());
                     }
                 }
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='current') foreach ($mbinfo_detail->getMbCurrent() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'current') foreach ($mbinfo_detail->getMbCurrent() as $dev) {
                     if ($current == null) {
                         $current = $mbinfo->addChild('Current');
                     }
@@ -513,8 +626,8 @@ class XML
                         $item->addAttribute('Event', $dev->getEvent());
                     }
                 }
-
-                if (!defined('PSI_ONLY') || PSI_ONLY==='other') foreach ($mbinfo_detail->getMbOther() as $dev) {
+                
+                if (!defined('PSI_ONLY') || PSI_ONLY === 'other') foreach ($mbinfo_detail->getMbOther() as $dev) {
                     if ($other == null) {
                         $other = $mbinfo->addChild('Other');
                     }
@@ -528,19 +641,18 @@ class XML
             }
         }
     }
-
+    
     /**
      * generate the ups information
      *
      * @return void
      */
-    private function _buildUpsinfo()
-    {
+    private function _buildUpsinfo () {
         $upsinfo = $this->_xml->addChild('UPSInfo');
         if (defined('PSI_UPS_APCUPSD_CGI_ENABLE') && PSI_UPS_APCUPSD_CGI_ENABLE) {
             $upsinfo->addAttribute('ApcupsdCgiLinks', true);
         }
-        if (sizeof(unserialize(PSI_UPSINFO))>0) {
+        if (sizeof(unserialize(PSI_UPSINFO)) > 0) {
             foreach (unserialize(PSI_UPSINFO) as $upsinfoclass) {
                 $upsinfo_data = new $upsinfoclass();
                 $upsinfo_detail = $upsinfo_data->getUPSInfo();
@@ -594,84 +706,21 @@ class XML
             }
         }
     }
-
-    /**
-     * generate the xml document
-     *
-     * @return void
-     */
-    private function _buildXml()
-    {
-        if (!$this->_plugin_request || $this->_complete_request) {
-            if ($this->_sys === null) {
-                if (PSI_DEBUG === true) {
-                    // unstable version check
-                    if (!is_numeric(substr(PSI_VERSION, -1))) {
-                        $this->_errors->addError("WARN", "This is an unstable version of phpSysInfo, some things may not work correctly");
-                    }
-
-                    // Safe mode check
-                    $safe_mode = @ini_get("safe_mode") ? true : false;
-                    if ($safe_mode) {
-                        $this->_errors->addError("WARN", "PhpSysInfo requires to set off 'safe_mode' in 'php.ini'");
-                    }
-                    // Include path check
-                    $include_path = @ini_get("include_path");
-                    if ($include_path && ($include_path!="")) {
-                        $include_path = preg_replace("/(:)|(;)/", "\n", $include_path);
-                        if (preg_match("/^\.$/m", $include_path)) {
-                            $include_path = ".";
-                        }
-                    }
-                    if ($include_path != ".") {
-                        $this->_errors->addError("WARN", "PhpSysInfo requires '.' inside the 'include_path' in php.ini");
-                    }
-                    // popen mode check
-                    if (defined("PSI_MODE_POPEN") && PSI_MODE_POPEN === true) {
-                        $this->_errors->addError("WARN", "Installed version of PHP does not support proc_open() function, popen() is used");
-                    }
-                }
-                $this->_sys = $this->_sysinfo->getSys();
-            }
-            if (!defined('PSI_ONLY') || PSI_ONLY==='vitals') $this->_buildVitals();
-            if (!defined('PSI_ONLY') || PSI_ONLY==='network') $this->_buildNetwork();
-            if (!defined('PSI_ONLY') || PSI_ONLY==='hardware') $this->_buildHardware();
-            if (!defined('PSI_ONLY') || PSI_ONLY==='memory') $this->_buildMemory();
-            if (!defined('PSI_ONLY') || PSI_ONLY==='filesystem') $this->_buildFilesystems();
-            if (!defined('PSI_ONLY') || in_array(PSI_ONLY, array('voltage','current','temperature','fans','power','other'))) $this->_buildMbinfo();
-            if (!defined('PSI_ONLY') || PSI_ONLY==='ups') $this->_buildUpsinfo();
-        }
-        if (!defined('PSI_ONLY')) $this->_buildPlugins();
-        $this->_xml->combinexml($this->_errors->errorsAddToXML($this->_sysinfo->getEncoding()));
-    }
-
-    /**
-     * get the xml object
-     *
-     * @return SimpleXmlElement
-     */
-    public function getXml()
-    {
-        $this->_buildXml();
-
-        return $this->_xml->getSimpleXmlElement();
-    }
-
+    
     /**
      * include xml-trees of the plugins to the main xml
      *
      * @return void
      */
-    private function _buildPlugins()
-    {
+    private function _buildPlugins () {
         $pluginroot = $this->_xml->addChild("Plugins");
         if (($this->_plugin_request || $this->_complete_request) && count($this->_plugins) > 0) {
-            $plugins = array();
+            $plugins = [];
             if ($this->_complete_request) {
                 $plugins = $this->_plugins;
             }
             if ($this->_plugin_request) {
-                $plugins = array($this->_plugin);
+                $plugins = [$this->_plugin];
             }
             foreach ($plugins as $plugin) {
                 $object = new $plugin($this->_sysinfo->getEncoding());
@@ -680,68 +729,6 @@ class XML
                 if (sizeof($oxml) > 0) {
                     $pluginroot->combinexml($oxml);
                 }
-            }
-        }
-    }
-
-    /**
-     * build the xml structure where the content can be inserted
-     *
-     * @return void
-     */
-    private function _xmlbody()
-    {
-        $dom = new DOMDocument('1.0', 'UTF-8');
-        $root = $dom->createElement("tns:phpsysinfo");
-        $root->setAttribute('xmlns:tns', 'http://phpsysinfo.sourceforge.net/');
-        $root->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
-        $root->setAttribute('xsi:schemaLocation', 'http://phpsysinfo.sourceforge.net/ phpsysinfo3.xsd');
-        $dom->appendChild($root);
-        $this->_xml = new SimpleXMLExtended(simplexml_import_dom($dom), $this->_sysinfo->getEncoding());
-
-        $generation = $this->_xml->addChild('Generation');
-        $generation->addAttribute('version', PSI_VERSION_STRING);
-        $generation->addAttribute('timestamp', time());
-        $options = $this->_xml->addChild('Options');
-        $options->addAttribute('tempFormat', defined('PSI_TEMP_FORMAT') ? strtolower(PSI_TEMP_FORMAT) : 'c');
-        $options->addAttribute('byteFormat', defined('PSI_BYTE_FORMAT') ? strtolower(PSI_BYTE_FORMAT) : 'auto_binary');
-        $options->addAttribute('datetimeFormat', defined('PSI_DATETIME_FORMAT') ? strtolower(PSI_DATETIME_FORMAT) : 'utc');
-        if (defined('PSI_REFRESH')) {
-            if (PSI_REFRESH === false) {
-                $options->addAttribute('refresh', 0);
-            } elseif (PSI_REFRESH === true) {
-                $options->addAttribute('refresh', 1);
-            } else {
-                $options->addAttribute('refresh', PSI_REFRESH);
-            }
-        } else {
-            $options->addAttribute('refresh', 60000);
-        }
-        if (defined('PSI_FS_USAGE_THRESHOLD')) {
-            if (PSI_FS_USAGE_THRESHOLD === true) {
-                $options->addAttribute('threshold', 1);
-            } elseif ((PSI_FS_USAGE_THRESHOLD !== false) && (PSI_FS_USAGE_THRESHOLD >= 1) && (PSI_FS_USAGE_THRESHOLD <= 99)) {
-                $options->addAttribute('threshold', PSI_FS_USAGE_THRESHOLD);
-            }
-        } else {
-            $options->addAttribute('threshold', 90);
-        }
-        if (count($this->_plugins) > 0) {
-            if ($this->_plugin_request) {
-                $plug = $this->_xml->addChild('UsedPlugins');
-                $plug->addChild('Plugin')->addAttribute('name', $this->_plugin);
-            } elseif ($this->_complete_request) {
-                $plug = $this->_xml->addChild('UsedPlugins');
-                foreach ($this->_plugins as $plugin) {
-                    $plug->addChild('Plugin')->addAttribute('name', $plugin);
-                }
-/*
-            } else {
-                $plug = $this->_xml->addChild('UnusedPlugins');
-                foreach ($this->_plugins as $plugin) {
-                    $plug->addChild('Plugin')->addAttribute('name', $plugin);
-                }
-*/
             }
         }
     }

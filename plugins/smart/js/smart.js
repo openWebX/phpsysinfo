@@ -91,8 +91,8 @@ function smart_populate(xml) {
         // On "columns" so we get the right order
         // fixed for Firefox (fix wrong order)
         $("Plugins Plugin_SMART columns column", xml).each(function smart_find_columns() {
-            i  = parseInt($(this).attr("id"), 10);
-            if (typeof(values[i])==='undefined') {
+            i = parseInt($(this).attr("id"), 10);
+            if (typeof(values[i]) === 'undefined') {
                 display.push("<span style=\"display:none;\"></span>");
             }
             else if (i === 194) {

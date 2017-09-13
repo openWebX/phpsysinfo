@@ -127,7 +127,7 @@ table {
 }
 
 #lang_047 {
-    color:444
+    color: 444
 }
 
 .plugin {
@@ -155,7 +155,7 @@ table {
     padding-right: 20px;
 }
 
-.dataTables_wrapper{
+.dataTables_wrapper {
     margin: 0 0 0 0 !important;
     border: 0px !important;
 }

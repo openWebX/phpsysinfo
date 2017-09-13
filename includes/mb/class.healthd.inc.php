@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.healthd.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting information from healthd
  *
  * @category  PHP
@@ -23,51 +24,61 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Healthd extends Sensors
-{
+class Healthd extends Sensors {
     /**
      * content to parse
      *
      * @var array
      */
-    private $_values = array();
-
+    private $_values = [];
+    
     /**
      * fill the private content var through command or data access
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
-        switch (defined('PSI_SENSOR_HEALTHD_ACCESS')?strtolower(PSI_SENSOR_HEALTHD_ACCESS):'command') {
-        case 'command':
-            if (CommonFunctions::executeProgram('healthdc', '-t', $lines)) {
-                $lines0 = preg_split("/\n/", $lines, 1, PREG_SPLIT_NO_EMPTY);
-                if (count($lines0) == 1) {
-                    $this->_values = preg_split("/\t+/", $lines0[0]);
+        switch (defined('PSI_SENSOR_HEALTHD_ACCESS') ? strtolower(PSI_SENSOR_HEALTHD_ACCESS) : 'command') {
+            case 'command':
+                if (CommonFunctions::executeProgram('healthdc', '-t', $lines)) {
+                    $lines0 = preg_split("/\n/", $lines, 1, PREG_SPLIT_NO_EMPTY);
+                    if (count($lines0) == 1) {
+                        $this->_values = preg_split("/\t+/", $lines0[0]);
+                    }
                 }
-            }
-            break;
-        case 'data':
-            if (CommonFunctions::rfts(APP_ROOT.'/data/healthd.txt', $lines)) {
-                $lines0 = preg_split("/\n/", $lines, 1, PREG_SPLIT_NO_EMPTY);
-                if (count($lines0) == 1) {
-                    $this->_values = preg_split("/\t+/", $lines0[0]);
+                break;
+            case 'data':
+                if (CommonFunctions::rfts(APP_ROOT . '/data/healthd.txt', $lines)) {
+                    $lines0 = preg_split("/\n/", $lines, 1, PREG_SPLIT_NO_EMPTY);
+                    if (count($lines0) == 1) {
+                        $this->_values = preg_split("/\t+/", $lines0[0]);
+                    }
                 }
-            }
-            break;
-        default:
-            $this->error->addConfigError('__construct()', 'PSI_SENSOR_HEALTHD_ACCESS');
-            break;
+                break;
+            default:
+                $this->error->addConfigError('__construct()', 'PSI_SENSOR_HEALTHD_ACCESS');
+                break;
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_Sensor::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_temperature();
+        $this->_fans();
+        $this->_voltage();
+    }
+    
     /**
      * get temperature information
      *
      * @return void
      */
-    private function _temperature()
-    {
+    private function _temperature () {
         if (count($this->_values) == 14) {
             $dev1 = new SensorDevice();
             $dev1->setName('temp1');
@@ -86,14 +97,13 @@ class Healthd extends Sensors
             $this->mbinfo->setMbTemp($dev3);
         }
     }
-
+    
     /**
      * get fan information
      *
      * @return void
      */
-    private function _fans()
-    {
+    private function _fans () {
         if (count($this->_values) == 14) {
             $dev1 = new SensorDevice();
             $dev1->setName('fan1');
@@ -112,14 +122,13 @@ class Healthd extends Sensors
             $this->mbinfo->setMbFan($dev3);
         }
     }
-
+    
     /**
      * get voltage information
      *
      * @return void
      */
-    private function _voltage()
-    {
+    private function _voltage () {
         if (count($this->_values) == 14) {
             $dev1 = new SensorDevice();
             $dev1->setName('Vcore1');
@@ -150,19 +159,5 @@ class Healthd extends Sensors
             $dev7->setValue($this->_values[13]);
             $this->mbinfo->setMbVolt($dev7);
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_Sensor::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_temperature();
-        $this->_fans();
-        $this->_voltage();
     }
 }

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<schema targetNamespace="http://phpsysinfo.sourceforge.net/" elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://phpsysinfo.sourceforge.net/">
+<schema xmlns:tns="http://phpsysinfo.sourceforge.net/" targetNamespace="http://phpsysinfo.sourceforge.net/"
+        elementFormDefault="qualified" xmlns="http://www.w3.org/2001/XMLSchema">
 
     <complexType name="Generation">
         <attribute name="version" type="string" use="required"></attribute>
@@ -458,7 +459,8 @@
     <complexType name="Plugins">
         <sequence>
             <any minOccurs="0" maxOccurs="unbounded"></any>
-        </sequence></complexType>
+        </sequence>
+    </complexType>
 
     <element name="phpsysinfo" type="tns:phpsysinfo"></element>
 </schema>

@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.ups.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * Basic UPS functions for all UPS classes
  *
  * @category  PHP
@@ -23,31 +24,29 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-abstract class UPS implements PSI_Interface_UPS
-{
+abstract class UPS implements PSI_Interface_UPS {
     /**
      * object for error handling
      *
      * @var PSI_Error
      */
     public $error;
-
+    
     /**
      * main object for ups information
      *
      * @var UPSInfo
      */
     protected $upsinfo;
-
+    
     /**
      * build the global Error object
      */
-    public function __construct()
-    {
+    public function __construct () {
         $this->error = PSI_Error::singleton();
         $this->upsinfo = new UPSInfo();
     }
-
+    
     /**
      * build and return the ups information
      *
@@ -55,10 +54,9 @@ abstract class UPS implements PSI_Interface_UPS
      *
      * @return UPSInfo
      */
-    final public function getUPSInfo()
-    {
+    final public function getUPSInfo () {
         $this->build();
-
+        
         return $this->upsinfo;
     }
 }

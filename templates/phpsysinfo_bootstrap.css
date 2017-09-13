@@ -76,27 +76,33 @@ wbr {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
 }
+
 .normalicon-right:before {
     content: "\25ba";
 }
+
 .normalicon-down:before {
     content: "\25bc";
 }
+
 /* IE6 fix */
 * html .normalicon-right {
     background: url('../gfx/right_black.gif') no-repeat;
     height: 14px;
 }
+
 * html .normalicon-down {
     background: url('../gfx/down_black.gif') no-repeat;
     height: 14px;
 }
+
 /* IE7 fix */
-*+html .normalicon-right {
+* + html .normalicon-right {
     background: url('../gfx/right_black.gif') no-repeat;
     height: 14px;
 }
-*+html .normalicon-down {
+
+* + html .normalicon-down {
     background: url('../gfx/down_black.gif') no-repeat;
     height: 14px;
 }
@@ -121,7 +127,7 @@ table.sortable thead th:hover {
 }
 
 table.borderless td, table.borderless th, table.noborderattop tr:first-child td, table.noborderattop tr:first-child th {
-    border: none!important;
+    border: none !important;
 }
 
 .table {
@@ -149,8 +155,8 @@ table.borderless td, table.borderless th, table.noborderattop tr:first-child td,
 }
 
 .panel-heading {
-  background-color: #337ab7!important;
-  border-color: #337ab7!important;
+    background-color: #337ab7 !important;
+    border-color: #337ab7 !important;
 }
 
 .reload {
@@ -160,7 +166,7 @@ table.borderless td, table.borderless th, table.noborderattop tr:first-child td,
     cursor: pointer;
     border: 0px;
     width: 16px;
-    height: 16px;    
+    height: 16px;
 }
 
 a, a:visited {

@@ -12,11 +12,11 @@ function renderPlugin_updatenotifier(data) {
             }
         }
     };
-    if ((data['Plugins']['Plugin_UpdateNotifier'] !== undefined) && (data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"] !== undefined)){
+    if ((data['Plugins']['Plugin_UpdateNotifier'] !== undefined) && (data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"] !== undefined)) {
         $('#updatenotifier').render(data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"], directives);
         if ((data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"]["packages"] == 0) &&
-            (data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"]["security"] == 0) ) {
-            $("#updatenotifier-info").html("<strong>"+genlang(5, false, 'updatenotifier')+"</strong>");
+            (data['Plugins']['Plugin_UpdateNotifier']["UpdateNotifier"]["security"] == 0)) {
+            $("#updatenotifier-info").html("<strong>" + genlang(5, false, 'updatenotifier') + "</strong>");
         }
         $('#block_updatenotifier').show();
     } else {

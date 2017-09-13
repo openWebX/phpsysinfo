@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.lmsensors.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting information from lmsensor
  *
  * @category  PHP
@@ -23,55 +24,67 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class LMSensors extends Sensors
-{
+class LMSensors extends Sensors {
     /**
      * content to parse
      *
      * @var array
      */
-    private $_lines = array();
-
+    private $_lines = [];
+    
     /**
      * fill the private content var through command or data access
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
         $lines = "";
-        switch (defined('PSI_SENSOR_LMSENSORS_ACCESS')?strtolower(PSI_SENSOR_LMSENSORS_ACCESS):'command') {
-        case 'command':
-            CommonFunctions::executeProgram("sensors", "", $lines);
-            break;
-        case 'data':
-            CommonFunctions::rfts(APP_ROOT.'/data/lmsensors.txt', $lines);
-            break;
-        default:
-            $this->error->addConfigError('__construct()', 'PSI_SENSOR_LMSENSORS_ACCESS');
-            break;
+        switch (defined('PSI_SENSOR_LMSENSORS_ACCESS') ? strtolower(PSI_SENSOR_LMSENSORS_ACCESS) : 'command') {
+            case 'command':
+                CommonFunctions::executeProgram("sensors", "", $lines);
+                break;
+            case 'data':
+                CommonFunctions::rfts(APP_ROOT . '/data/lmsensors.txt', $lines);
+                break;
+            default:
+                $this->error->addConfigError('__construct()', 'PSI_SENSOR_LMSENSORS_ACCESS');
+                break;
         }
-
+        
         if (trim($lines) !== "") {
             $lines = str_replace(":\n", ":", $lines);
             $lines = str_replace("\n\n", "\n", $lines);
             $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_Sensor::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_temperature();
+        $this->_voltage();
+        $this->_fans();
+        $this->_power();
+        $this->_current();
+    }
+    
     /**
      * get temperature information
      *
      * @return void
      */
-    private function _temperature()
-    {
+    private function _temperature () {
         $applesmc = false;
         foreach ($this->_lines as $line) {
             if ((trim($line) !== "") && (strpos($line, ':') === false)) {
                 //$applesmc = preg_match("/^applesmc-/", $line);
-                $applesmc =  (trim($line) === "applesmc-isa-0300");
+                $applesmc = (trim($line) === "applesmc-isa-0300");
             }
-            $data = array();
+            $data = [];
             if (preg_match("/^(.+):(.+).C\s*\((.+)=(.+).C,(.+)=(.+).C\)(.*)\)/", $line, $data)) {
                 ;
             } elseif (preg_match("/^(.+):(.+).C\s*\((.+)=(.+).C,(.+)=(.+).C\)(.*)/", $line, $data)) {
@@ -83,10 +96,10 @@ class LMSensors extends Sensors
             } else {
                 preg_match("/^(.+):(.+).C$/", $line, $data);
             }
-            if (count($data)>2) {
-                foreach ($data as $key=>$value) {
+            if (count($data) > 2) {
+                foreach ($data as $key => $value) {
                     if (preg_match("/^\+?(-?[0-9\.]+).?$/", trim($value), $newvalue)) {
-                        $data[$key] = 0+trim($newvalue[1]);
+                        $data[$key] = 0 + trim($newvalue[1]);
                     } else {
                         $data[$key] = trim($value);
                     }
@@ -124,7 +137,7 @@ class LMSensors extends Sensors
                         } elseif ($data[1][1] == "W") {
                             $data[1] = $data[1] . " Airport";
                         }
-
+                        
                         if ($data[1][3] == "H") {
                             $data[1] = $data[1] . " Heatsink";
                         } elseif ($data[1][3] == "P") {
@@ -134,7 +147,7 @@ class LMSensors extends Sensors
                         }
                     }
                 }
-
+                
                 $dev = new SensorDevice();
                 $dev->setName($data[1]);
                 $dev->setValue($data[2]);
@@ -150,58 +163,15 @@ class LMSensors extends Sensors
             }
         }
     }
-
-    /**
-     * get fan information
-     *
-     * @return void
-     */
-    private function _fans()
-    {
-        foreach ($this->_lines as $line) {
-            $data = array();
-            if (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM,(.+)=(.+)\)(.*)\)/", $line, $data)) {
-                ;
-            } elseif (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM,(.+)=(.+)\)(.*)/", $line, $data)) {
-                ;
-            } elseif (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM\)(.*)/", $line, $data)) {
-                ;
-            } elseif (preg_match("/^(.+):(.+) RPM\s*\(/", $line, $data)) {
-                ;
-            } else {
-                preg_match("/^(.+):(.+) RPM$/", $line, $data);
-            }
-            if (count($data)>2) {
-                 foreach ($data as $key=>$value) {
-                    if (preg_match("/^\+?(-?[0-9\.]+).?$/", trim($value), $newvalue)) {
-                        $data[$key] = 0+trim($newvalue[1]);
-                    } else {
-                        $data[$key] = trim($value);
-                    }
-                }
-                $dev = new SensorDevice();
-                $dev->setName(trim($data[1]));
-                $dev->setValue(trim($data[2]));
-                if (isset($data[4])) {
-                    $dev->setMin(trim($data[4]));
-                }
-                if (preg_match("/\sALARM\s*$/", $line)) {
-                    $dev->setEvent("Alarm");
-                }
-                $this->mbinfo->setMbFan($dev);
-            }
-        }
-    }
-
+    
     /**
      * get voltage information
      *
      * @return void
      */
-    private function _voltage()
-    {
+    private function _voltage () {
         foreach ($this->_lines as $line) {
-            $data = array();
+            $data = [];
             if (preg_match("/^(.+):(.+) V\s*\((.+)=(.+) V,(.+)=(.+) V\)(.*)\)/", $line, $data)) {
                 ;
             } elseif (preg_match("/^(.+):(.+) V\s*\((.+)=(.+) V,(.+)=(.+) V\)(.*)/", $line, $data)) {
@@ -211,11 +181,11 @@ class LMSensors extends Sensors
             } else {
                 preg_match("/^(.+):(.+) V$/", $line, $data);
             }
-
-            if (count($data)>2) {
-                foreach ($data as $key=>$value) {
+            
+            if (count($data) > 2) {
+                foreach ($data as $key => $value) {
                     if (preg_match("/^\+?(-?[0-9\.]+)$/", trim($value), $newvalue)) {
-                        $data[$key] = 0+trim($newvalue[1]);
+                        $data[$key] = 0 + trim($newvalue[1]);
                     } else {
                         $data[$key] = trim($value);
                     }
@@ -236,23 +206,63 @@ class LMSensors extends Sensors
             }
         }
     }
-
+    
+    /**
+     * get fan information
+     *
+     * @return void
+     */
+    private function _fans () {
+        foreach ($this->_lines as $line) {
+            $data = [];
+            if (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM,(.+)=(.+)\)(.*)\)/", $line, $data)) {
+                ;
+            } elseif (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM,(.+)=(.+)\)(.*)/", $line, $data)) {
+                ;
+            } elseif (preg_match("/^(.+):(.+) RPM\s*\((.+)=(.+) RPM\)(.*)/", $line, $data)) {
+                ;
+            } elseif (preg_match("/^(.+):(.+) RPM\s*\(/", $line, $data)) {
+                ;
+            } else {
+                preg_match("/^(.+):(.+) RPM$/", $line, $data);
+            }
+            if (count($data) > 2) {
+                foreach ($data as $key => $value) {
+                    if (preg_match("/^\+?(-?[0-9\.]+).?$/", trim($value), $newvalue)) {
+                        $data[$key] = 0 + trim($newvalue[1]);
+                    } else {
+                        $data[$key] = trim($value);
+                    }
+                }
+                $dev = new SensorDevice();
+                $dev->setName(trim($data[1]));
+                $dev->setValue(trim($data[2]));
+                if (isset($data[4])) {
+                    $dev->setMin(trim($data[4]));
+                }
+                if (preg_match("/\sALARM\s*$/", $line)) {
+                    $dev->setEvent("Alarm");
+                }
+                $this->mbinfo->setMbFan($dev);
+            }
+        }
+    }
+    
     /**
      * get power information
      *
      * @return void
      */
-    private function _power()
-    {
+    private function _power () {
         foreach ($this->_lines as $line) {
-            $data = array();
-/* not tested yet
-            if (preg_match("/^(.+):(.+) W\s*\((.+)=(.+) W,(.+)=(.+) W\)(.*)\)/", $line, $data)) {
-                ;
-            } elseif (preg_match("/^(.+):(.+) W\s*\((.+)=(.+) W,(.+)=(.+) W\)(.*)/", $line, $data)) {
-                ;
-            } else
-*/
+            $data = [];
+            /* not tested yet
+                        if (preg_match("/^(.+):(.+) W\s*\((.+)=(.+) W,(.+)=(.+) W\)(.*)\)/", $line, $data)) {
+                            ;
+                        } elseif (preg_match("/^(.+):(.+) W\s*\((.+)=(.+) W,(.+)=(.+) W\)(.*)/", $line, $data)) {
+                            ;
+                        } else
+            */
             if (preg_match("/^(.+):(.+) W\s*\((.+)=(.+) W\)(.*)/", $line, $data)) {
                 ;
             } elseif (preg_match("/^(.+):(.+) W\s*\(/", $line, $data)) {
@@ -260,10 +270,10 @@ class LMSensors extends Sensors
             } else {
                 preg_match("/^(.+):(.+) W$/", $line, $data);
             }
-            if (count($data)>2) {
-                foreach ($data as $key=>$value) {
+            if (count($data) > 2) {
+                foreach ($data as $key => $value) {
                     if (preg_match("/^\+?(-?[0-9\.]+).?$/", trim($value), $newvalue)) {
-                        $data[$key] = 0+trim($newvalue[1]);
+                        $data[$key] = 0 + trim($newvalue[1]);
                     } else {
                         $data[$key] = trim($value);
                     }
@@ -271,12 +281,12 @@ class LMSensors extends Sensors
                 $dev = new SensorDevice();
                 $dev->setName($data[1]);
                 $dev->setValue($data[2]);
-
-/* not tested yet
-                if (isset($data[6]) && $data[2] <= $data[6]) {
-                    $dev->setMax(max($data[4], $data[6]));
-                } else
-*/
+                
+                /* not tested yet
+                                if (isset($data[6]) && $data[2] <= $data[6]) {
+                                    $dev->setMax(max($data[4], $data[6]));
+                                } else
+                */
                 if (isset($data[4]) && $data[2] <= $data[4]) {
                     $dev->setMax($data[4]);
                 }
@@ -287,16 +297,15 @@ class LMSensors extends Sensors
             }
         }
     }
-
+    
     /**
      * get current information
      *
      * @return void
      */
-    private function _current()
-    {
+    private function _current () {
         foreach ($this->_lines as $line) {
-            $data = array();
+            $data = [];
             if (preg_match("/^(.+):(.+) A\s*\((.+)=(.+) A,(.+)=(.+) A\)(.*)\)/", $line, $data)) {
                 ;
             } elseif (preg_match("/^(.+):(.+) A\s*\((.+)=(.+) A,(.+)=(.+) A\)(.*)/", $line, $data)) {
@@ -306,8 +315,8 @@ class LMSensors extends Sensors
             } else {
                 preg_match("/^(.+):(.+) A$/", $line, $data);
             }
-            if (count($data)>2) {
-                foreach ($data as $key=>$value) {
+            if (count($data) > 2) {
+                foreach ($data as $key => $value) {
                     if (preg_match("/^\+?([0-9\.]+).?$/", trim($value), $newvalue)) {
                         $data[$key] = trim($newvalue[1]);
                     } else {
@@ -329,21 +338,5 @@ class LMSensors extends Sensors
                 $this->mbinfo->setMbCurrent($dev);
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_Sensor::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_temperature();
-        $this->_voltage();
-        $this->_fans();
-        $this->_power();
-        $this->_current();
     }
 }

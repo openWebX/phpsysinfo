@@ -33,7 +33,8 @@ var dmraid_show = false;
  * @param {number} id id of the device
  */
 function dmraid_buildinfos(xml, id) {
-    var html = "", devname = "", devstatus = "", devtype = "",devsize = 0, devstride = 0, devsubsets = 0, devdevs = 0, devspares = 0, button = "";
+    var html = "", devname = "", devstatus = "", devtype = "", devsize = 0, devstride = 0, devsubsets = 0, devdevs = 0,
+        devspares = 0, button = "";
 
     devname = $(xml).attr("Name");
     devstatus = $(xml).attr("Disk_Status");
@@ -88,27 +89,27 @@ function dmraid_diskicon(xml) {
         diskstatus = $(this).attr("Status");
         diskname = $(this).attr("Name");
         switch (diskstatus) {
-        case "ok":
-            img = "harddriveok.png";
-            alt = "ok";
-            break;
-        case "F":
-            img = "harddrivefail.png";
-            alt = "fail";
-            break;
-        case "S":
-            img = "harddrivespare.png";
-            alt = "spare";
-            break;
-        case "W":
-            img = "harddrivewarn.png";
-            alt = "fail";
-            break;
-        default:
+            case "ok":
+                img = "harddriveok.png";
+                alt = "ok";
+                break;
+            case "F":
+                img = "harddrivefail.png";
+                alt = "fail";
+                break;
+            case "S":
+                img = "harddrivespare.png";
+                alt = "spare";
+                break;
+            case "W":
+                img = "harddrivewarn.png";
+                alt = "fail";
+                break;
+            default:
 //            alert("--" + diskstatus + "--");
-            img = "error.png";
-            alt = "error";
-            break;
+                img = "error.png";
+                alt = "error";
+                break;
         }
         html += "<img class=\"plugin_dmraid_biun\" src=\"./plugins/dmraid/gfx/" + img + "\" alt=\"" + alt + "\" title=\"\" style=\"width:60px;height:60px;\" onload=\"PNGload($(this));\" />"; //onload IE6 PNG fix
         html += "<small>" + diskname + "</small>";

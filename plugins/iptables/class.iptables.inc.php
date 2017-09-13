@@ -13,6 +13,7 @@
  * @version   SVN: $Id: class.iptables.inc.php 661 2016-05-03 11:26:39Z erpomata $
  * @link      http://phpsysinfo.sourceforge.net
  */
+
 /**
  * Iptables plugin, which displays all iptables informations available
  *
@@ -24,40 +25,17 @@
  * @version   Release: 1.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-
-class iptables extends PSI_Plugin
-{
+class iptables extends PSI_Plugin {
     private $_lines;
-
-    public function __construct($enc)
-    {
+    
+    public function __construct ($enc) {
         parent::__construct(__CLASS__, $enc);
-
-        $this->_lines = array();
+        
+        $this->_lines = [];
     }
-
-    /**
-     * get iptables information
-     *
-     * @return array iptables in array with label
-     */
-
-    private function getIptables()
-    {
-        $result = array();
-        $i = 0;
-
-        foreach ($this->_lines as $line) {
-            $result[$i]['rule'] = $line;
-            $i++;
-        }
-
-        return $result;
-    }
-
-    public function execute()
-    {
-        $this->_lines = array();
+    
+    public function execute () {
+        $this->_lines = [];
         switch (strtolower(PSI_PLUGIN_IPTABLES_ACCESS)) {
             case 'command':
                 $lines = "";
@@ -65,7 +43,7 @@ class iptables extends PSI_Plugin
                     $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
                 break;
             case 'data':
-                if (CommonFunctions::rfts(APP_ROOT."/data/iptables.txt", $lines) && !empty($lines))
+                if (CommonFunctions::rfts(APP_ROOT . "/data/iptables.txt", $lines) && !empty($lines))
                     $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
                 break;
             default:
@@ -73,12 +51,11 @@ class iptables extends PSI_Plugin
                 break;
         }
     }
-
-    public function xml()
-    {
+    
+    public function xml () {
         if (empty($this->_lines))
-        return $this->xml->getSimpleXmlElement();
-
+            return $this->xml->getSimpleXmlElement();
+        
         $arrBuff = $this->getIptables();
         if (sizeof($arrBuff) > 0) {
             $iptables = $this->xml->addChild("iptables");
@@ -87,7 +64,25 @@ class iptables extends PSI_Plugin
                 $item->addAttribute('Rule', $arrValue['rule']);
             }
         }
-
+        
         return $this->xml->getSimpleXmlElement();
+    }
+    
+    /**
+     * get iptables information
+     *
+     * @return array iptables in array with label
+     */
+    
+    private function getIptables () {
+        $result = [];
+        $i = 0;
+        
+        foreach ($this->_lines as $line) {
+            $result[$i]['rule'] = $line;
+            $i++;
+        }
+        
+        return $result;
     }
 }

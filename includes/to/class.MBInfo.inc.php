@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.MBInfo.inc.php 253 2009-06-17 13:07:50Z bigmichi1 $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * MBInfo TO class
  *
  * @category  PHP
@@ -23,8 +24,7 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class MBInfo
-{
+class MBInfo {
     /**
      * array with SensorDevices for temperatures
      *
@@ -32,8 +32,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbTemp = array();
-
+    private $_mbTemp = [];
+    
     /**
      * array with SensorDevices for fans
      *
@@ -41,8 +41,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbFan = array();
-
+    private $_mbFan = [];
+    
     /**
      * array with SensorDevices for voltages
      *
@@ -50,8 +50,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbVolt = array();
-
+    private $_mbVolt = [];
+    
     /**
      * array with SensorDevices for power
      *
@@ -59,8 +59,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbPower = array();
-
+    private $_mbPower = [];
+    
     /**
      * array with SensorDevices for apmers
      *
@@ -68,8 +68,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbCurrent = array();
-
+    private $_mbCurrent = [];
+    
     /**
      * array with SensorDevices for other
      *
@@ -77,8 +77,8 @@ class MBInfo
      *
      * @var array
      */
-    private $_mbOther = array();
-
+    private $_mbOther = [];
+    
     /**
      * Returns $_mbFan.
      *
@@ -86,11 +86,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbFan()
-    {
+    public function getMbFan () {
         return $this->_mbFan;
     }
-
+    
     /**
      * Sets $_mbFan.
      *
@@ -100,11 +99,10 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbFan($mbFan)
-    {
+    public function setMbFan ($mbFan) {
         array_push($this->_mbFan, $mbFan);
     }
-
+    
     /**
      * Returns $_mbTemp.
      *
@@ -112,11 +110,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbTemp()
-    {
+    public function getMbTemp () {
         return $this->_mbTemp;
     }
-
+    
     /**
      * Sets $_mbTemp.
      *
@@ -126,11 +123,10 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbTemp($mbTemp)
-    {
+    public function setMbTemp ($mbTemp) {
         array_push($this->_mbTemp, $mbTemp);
     }
-
+    
     /**
      * Returns $_mbVolt.
      *
@@ -138,11 +134,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbVolt()
-    {
+    public function getMbVolt () {
         return $this->_mbVolt;
     }
-
+    
     /**
      * Sets $_mbVolt.
      *
@@ -152,11 +147,10 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbVolt($mbVolt)
-    {
+    public function setMbVolt ($mbVolt) {
         array_push($this->_mbVolt, $mbVolt);
     }
-
+    
     /**
      * Returns $_mbPower.
      *
@@ -164,11 +158,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbPower()
-    {
+    public function getMbPower () {
         return $this->_mbPower;
     }
-
+    
     /**
      * Sets $_mbPower.
      *
@@ -178,11 +171,10 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbPower($mbPower)
-    {
+    public function setMbPower ($mbPower) {
         array_push($this->_mbPower, $mbPower);
     }
-
+    
     /**
      * Returns $_mbCurrent.
      *
@@ -190,11 +182,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbCurrent()
-    {
+    public function getMbCurrent () {
         return $this->_mbCurrent;
     }
-
+    
     /**
      * Sets $_mbCurrent.
      *
@@ -204,11 +195,10 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbCurrent($mbCurrent)
-    {
+    public function setMbCurrent ($mbCurrent) {
         array_push($this->_mbCurrent, $mbCurrent);
     }
-
+    
     /**
      * Returns $_mbOther.
      *
@@ -216,11 +206,10 @@ class MBInfo
      *
      * @return array
      */
-    public function getMbOther()
-    {
+    public function getMbOther () {
         return $this->_mbOther;
     }
-
+    
     /**
      * Sets $_mbOther.
      *
@@ -230,8 +219,7 @@ class MBInfo
      *
      * @return void
      */
-    public function setMbOther($mbOther)
-    {
+    public function setMbOther ($mbOther) {
         array_push($this->_mbOther, $mbOther);
     }
 }

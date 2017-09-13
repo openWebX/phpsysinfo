@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.dmraid.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * dmraid Plugin, which displays software RAID status
  *
  * @category  PHP
@@ -23,43 +24,41 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class DMRaid extends PSI_Plugin
-{
+class DMRaid extends PSI_Plugin {
     /**
      * variable, which holds the content of the command
      * @var array
      */
     private $_filecontent = "";
-
+    
     /**
      * variable, which holds the result before the xml is generated out of this array
      * @var array
      */
-    private $_result = array();
-
+    private $_result = [];
+    
     /**
      * read the data into an internal array and also call the parent constructor
      *
      * @param String $enc encoding
      */
-    public function __construct($enc)
-    {
+    public function __construct ($enc) {
         $buffer = "";
         parent::__construct(__CLASS__, $enc);
         switch (strtolower(PSI_PLUGIN_DMRAID_ACCESS)) {
-        case 'command':
-            if (PSI_OS == 'FreeBSD') {
-                CommonFunctions::executeProgram("graid", "list", $buffer);
-            } else {
-                CommonFunctions::executeProgram("dmraid", "-s -vv 2>&1", $buffer);
-            }
-            break;
-        case 'data':
-            CommonFunctions::rfts(APP_ROOT."/data/dmraid.txt", $buffer);
-            break;
-        default:
-            $this->global_error->addConfigError("__construct()", "PSI_PLUGIN_DMRAID_ACCESS");
-            break;
+            case 'command':
+                if (PSI_OS == 'FreeBSD') {
+                    CommonFunctions::executeProgram("graid", "list", $buffer);
+                } else {
+                    CommonFunctions::executeProgram("dmraid", "-s -vv 2>&1", $buffer);
+                }
+                break;
+            case 'data':
+                CommonFunctions::rfts(APP_ROOT . "/data/dmraid.txt", $buffer);
+                break;
+            default:
+                $this->global_error->addConfigError("__construct()", "PSI_PLUGIN_DMRAID_ACCESS");
+                break;
         }
         if (trim($buffer) != "") {
             if (PSI_OS == 'FreeBSD') {
@@ -68,10 +67,10 @@ class DMRaid extends PSI_Plugin
                 $this->_filecontent = preg_split("/(\r?\n\*\*\* )|(\r?\n--> )/", $buffer, -1, PREG_SPLIT_NO_EMPTY);
             }
         } else {
-            $this->_filecontent = array();
+            $this->_filecontent = [];
         }
     }
-
+    
     /**
      * doing all tasks to get the required informations that the plugin needs
      * result is stored in an internal array<br>the array is build like a tree,
@@ -79,23 +78,22 @@ class DMRaid extends PSI_Plugin
      *
      * @return void
      */
-    public function execute()
-    {
+    public function execute () {
         if (empty($this->_filecontent)) {
             return;
         }
         if (PSI_OS == 'FreeBSD') {
-            $disksinfo = array();
-            if (isset($this->_filecontent[1]) && (trim($this->_filecontent[1])!=="")) {
+            $disksinfo = [];
+            if (isset($this->_filecontent[1]) && (trim($this->_filecontent[1]) !== "")) {
                 $lines = preg_split("/\r?\n/", trim($this->_filecontent[1]), -1, PREG_SPLIT_NO_EMPTY);
                 $disk = "";
                 foreach ($lines as $line) {
                     if (preg_match("/^\d+\.\s+Name:\s+(.+)/", $line, $data)) {
                         $disk = $data[1];
-                    } elseif (($disk!=="") && preg_match('/^\s+State:\s+(\S+)\s+\(([^\)\s]+)\s*([\d]*)(%*)([^\)]*)\)/', $line, $data)) {
+                    } elseif (($disk !== "") && preg_match('/^\s+State:\s+(\S+)\s+\(([^\)\s]+)\s*([\d]*)(%*)([^\)]*)\)/', $line, $data)) {
                         $disksinfo[$disk]['status'] = trim($data[1]);
                         $disksinfo[$disk]['substatus'] = trim($data[2]);
-                        if (trim($data[4])=="%") {
+                        if (trim($data[4]) == "%") {
                             $disksinfo[$disk]['percent'] = trim($data[3]);
                         }
                     }
@@ -106,7 +104,7 @@ class DMRaid extends PSI_Plugin
             foreach ($lines as $line) {
                 if (preg_match("/^\d+\.\s+Name:\s+(.+)/", $line, $data)) {
                     $group = $data[1];
-                } elseif ($group!=="") {
+                } elseif ($group !== "") {
                     if (preg_match('/^\s+Mediasize:\s+(\d+)/', $line, $data)) {
                         $this->_result['devices'][$group]['size'] = trim($data[1]);
                     } elseif (preg_match('/^\s+State:\s+(.+)/', $line, $data)) {
@@ -122,11 +120,11 @@ class DMRaid extends PSI_Plugin
                         $nones = 0;
                         foreach ($disks as $disk) {
                             if (preg_match("/^(\S+)\s+\(([^\)]+)\)/", $disk, $partition)) {
-                                if ($partition[2]=="ACTIVE") {
+                                if ($partition[2] == "ACTIVE") {
                                     if (isset($disksinfo[$partition[1]]["status"])) {
-                                        if ($disksinfo[$partition[1]]["status"]!=="ACTIVE") {
+                                        if ($disksinfo[$partition[1]]["status"] !== "ACTIVE") {
                                             $this->_result['devices'][$group]['partitions'][$partition[1]]['status'] = 'W';
-                                        } elseif ($disksinfo[$partition[1]]["substatus"]=="ACTIVE") {
+                                        } elseif ($disksinfo[$partition[1]]["substatus"] == "ACTIVE") {
                                             $this->_result['devices'][$group]['partitions'][$partition[1]]['status'] = 'ok';
                                         } else {
                                             $this->_result['devices'][$group]['partitions'][$partition[1]]['status'] = 'W';
@@ -138,8 +136,8 @@ class DMRaid extends PSI_Plugin
                                     } else {
                                         $this->_result['devices'][$group]['partitions'][$partition[1]]['status'] = 'ok';
                                     }
-                                } elseif ($partition[2]=="NONE") {
-                                    $this->_result['devices'][$group]['partitions']["none".$nones]['status'] = 'E';
+                                } elseif ($partition[2] == "NONE") {
+                                    $this->_result['devices'][$group]['partitions']["none" . $nones]['status'] = 'E';
                                     $nones++;
                                 }
                             }
@@ -157,7 +155,7 @@ class DMRaid extends PSI_Plugin
                         if (preg_match('/^NOTICE: added\s+\/dev\/(.+)\s+to RAID set\s+\"(.+)\"/', $line, $partition)) {
                             $this->_result['devices'][$partition[2]]['partitions'][$partition[1]]['status'] = "ok";
                         } elseif (preg_match('/^ERROR: .* device\s+\/dev\/(.+)\s+(.+)\s+in RAID set\s+\"(.+)\"/', $line, $partition)) {
-                            if ($partition[2]=="broken") {
+                            if ($partition[2] == "broken") {
                                 $this->_result['devices'][$partition[3]]['partitions'][$partition[1]]['status'] = 'F';
                             } else {
                                 $this->_result['devices'][$partition[3]]['partitions'][$partition[1]]['status'] = 'W';
@@ -169,7 +167,7 @@ class DMRaid extends PSI_Plugin
                         $group = trim($arrname[1]);
                     }
                     if (preg_match('/^name\s*:\s*(.*)/m', $block, $arrname)) {
-                        if ($group=="") {
+                        if ($group == "") {
                             $group = trim($arrname[1]);
                         }
                         $this->_result['devices'][$group]['name'] = $arrname[1];
@@ -177,7 +175,7 @@ class DMRaid extends PSI_Plugin
                             $this->_result['devices'][$group]['size'] = trim($size[1]);
                         }
                         if (preg_match('/^stride\s*:\s*(.*)/m', $block, $stride)) {
-                                $this->_result['devices'][$group]['stride'] = trim($stride[1]);
+                            $this->_result['devices'][$group]['stride'] = trim($stride[1]);
                         }
                         if (preg_match('/^type\s*:\s*(.*)/m', $block, $type)) {
                             $this->_result['devices'][$group]['type'] = trim($type[1]);
@@ -192,7 +190,7 @@ class DMRaid extends PSI_Plugin
                             $this->_result['devices'][$group]['devs'] = trim($devs[1]);
                         }
                         if (preg_match('/^spares\s*:\s*(.*)/m', $block, $spares)) {
-                                $this->_result['devices'][$group]['spares'] = trim($spares[1]);
+                            $this->_result['devices'][$group]['spares'] = trim($spares[1]);
                         }
                         $group = "";
                     }
@@ -200,26 +198,25 @@ class DMRaid extends PSI_Plugin
             }
         }
     }
-
+    
     /**
      * generates the XML content for the plugin
      *
      * @return SimpleXMLElement entire XML content for the plugin
      */
-    public function xml()
-    {
+    public function xml () {
         if (empty($this->_result)) {
             return $this->xml->getSimpleXmlElement();
         }
-        $hideRaids = array();
+        $hideRaids = [];
         if (defined('PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES') && is_string(PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES)) {
             if (preg_match(ARRAY_EXP, PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES)) {
                 $hideRaids = eval(PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES);
             } else {
-                $hideRaids = array(PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES);
+                $hideRaids = [PSI_PLUGIN_DMRAID_HIDE_RAID_DEVICES];
             }
         }
-        foreach ($this->_result['devices'] as $key=>$device) {
+        foreach ($this->_result['devices'] as $key => $device) {
             if (!in_array($key, $hideRaids, true)) {
                 $dev = $this->xml->addChild("Raid");
                 $dev->addAttribute("Device_Name", $key);
@@ -237,10 +234,10 @@ class DMRaid extends PSI_Plugin
                     $action->addAttribute("Name", $device['action']['name']);
                 }
                 $disks = $dev->addChild("Disks");
-                if (isset($device['partitions']) && sizeof($device['partitions']>0)) foreach ($device['partitions'] as $diskkey=>$disk) {
+                if (isset($device['partitions']) && sizeof($device['partitions'] > 0)) foreach ($device['partitions'] as $diskkey => $disk) {
                     $disktemp = $disks->addChild("Disk");
                     $disktemp->addAttribute("Name", $diskkey);
-                    if (($device["status"]=='ok') || ($device["status"]=='OPTIMAL')) {
+                    if (($device["status"] == 'ok') || ($device["status"] == 'OPTIMAL')) {
                         $disktemp->addAttribute("Status", $disk['status']);
                     } else {
                         $disktemp->addAttribute("Status", 'W');
@@ -248,7 +245,7 @@ class DMRaid extends PSI_Plugin
                 }
             }
         }
-
+        
         return $this->xml->getSimpleXmlElement();
     }
 }

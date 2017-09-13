@@ -26,6 +26,7 @@
 "use strict";
 
 var bat_show = false, bat_table;
+
 /**
  * insert content into table
  * @param {jQuery} xml plugin-XML
@@ -35,7 +36,9 @@ function bat_populate(xml) {
     bat_table.fnClearTable();
 
     $("Plugins Plugin_BAT Bat", xml).each(function bat_getitem(idp) {
-        var DesignCapacity = "", FullCapacity = "", Capacity = "", DesignVoltage = "",  BatteryType = "",RemainingCapacity = "", PresentVoltage = "", ChargingState = "", BatteryTemperature = "", BatteryCondition = "", CapacityUnit = "", CycleCount = "", DesignVoltageMax = "";
+        var DesignCapacity = "", FullCapacity = "", Capacity = "", DesignVoltage = "", BatteryType = "",
+            RemainingCapacity = "", PresentVoltage = "", ChargingState = "", BatteryTemperature = "",
+            BatteryCondition = "", CapacityUnit = "", CycleCount = "", DesignVoltageMax = "";
         DesignCapacity = $(this).attr("DesignCapacity");
         FullCapacity = $(this).attr("FullCapacity");
         DesignVoltage = $(this).attr("DesignVoltage");
@@ -54,20 +57,20 @@ function bat_populate(xml) {
         }
 
         if ((CapacityUnit == "%") && (RemainingCapacity != undefined)) {
-            bat_table.fnAddData([genlang(3, false, "BAT"), createBar(round(parseInt(RemainingCapacity, 10),0)), '&nbsp;']);
+            bat_table.fnAddData([genlang(3, false, "BAT"), createBar(round(parseInt(RemainingCapacity, 10), 0)), '&nbsp;']);
         } else {
             if (DesignCapacity != undefined) {
-                bat_table.fnAddData([genlang(2, false, "BAT"), DesignCapacity+' '+CapacityUnit, '&nbsp;']);
+                bat_table.fnAddData([genlang(2, false, "BAT"), DesignCapacity + ' ' + CapacityUnit, '&nbsp;']);
             }
             if (FullCapacity == undefined) {
-                if (RemainingCapacity != undefined) bat_table.fnAddData([genlang(3, false, "BAT"), RemainingCapacity+' '+CapacityUnit, '&nbsp;']);
+                if (RemainingCapacity != undefined) bat_table.fnAddData([genlang(3, false, "BAT"), RemainingCapacity + ' ' + CapacityUnit, '&nbsp;']);
             } else {
                 if (DesignCapacity == undefined) {
-                    bat_table.fnAddData([genlang(13, false, "BAT"), FullCapacity+' '+CapacityUnit, '&nbsp;']);
-                } else {            
-                    bat_table.fnAddData([genlang(13, false, "BAT"), FullCapacity+' '+CapacityUnit, createBar(parseInt(DesignCapacity, 10) != 0 ? round(parseInt(FullCapacity, 10) / parseInt(DesignCapacity, 10) * 100, 0) : 0)]);
+                    bat_table.fnAddData([genlang(13, false, "BAT"), FullCapacity + ' ' + CapacityUnit, '&nbsp;']);
+                } else {
+                    bat_table.fnAddData([genlang(13, false, "BAT"), FullCapacity + ' ' + CapacityUnit, createBar(parseInt(DesignCapacity, 10) != 0 ? round(parseInt(FullCapacity, 10) / parseInt(DesignCapacity, 10) * 100, 0) : 0)]);
                 }
-                if (RemainingCapacity != undefined) bat_table.fnAddData([genlang(3, false, "BAT"), RemainingCapacity+' '+CapacityUnit, createBar(parseInt(FullCapacity, 10) != 0 ? round(parseInt(RemainingCapacity, 10) / parseInt(FullCapacity, 10) * 100, 0) : 0)]);
+                if (RemainingCapacity != undefined) bat_table.fnAddData([genlang(3, false, "BAT"), RemainingCapacity + ' ' + CapacityUnit, createBar(parseInt(FullCapacity, 10) != 0 ? round(parseInt(RemainingCapacity, 10) / parseInt(FullCapacity, 10) * 100, 0) : 0)]);
             }
         }
         if (ChargingState != undefined) {
@@ -75,15 +78,15 @@ function bat_populate(xml) {
         }
         if (DesignVoltage != undefined) {
             if (DesignVoltageMax != undefined) {
-                bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltage+' mV', DesignVoltageMax+' mV']);
+                bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltage + ' mV', DesignVoltageMax + ' mV']);
             } else {
-                bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltage+' mV', '&nbsp;']);
+                bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltage + ' mV', '&nbsp;']);
             }
         } else if (DesignVoltageMax != undefined) {
-            bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltageMax+' mV', '&nbsp;']);
+            bat_table.fnAddData([genlang(4, false, "BAT"), DesignVoltageMax + ' mV', '&nbsp;']);
         }
         if (PresentVoltage != undefined) {
-            bat_table.fnAddData([genlang(5, false, "BAT"), PresentVoltage+' mV', '&nbsp;']);
+            bat_table.fnAddData([genlang(5, false, "BAT"), PresentVoltage + ' mV', '&nbsp;']);
         }
         if (BatteryType != undefined) {
             bat_table.fnAddData([genlang(9, false, "BAT"), BatteryType, '&nbsp;']);

@@ -4,18 +4,19 @@ function renderPlugin_ps(data) {
         MemoryUsage: {
             html: function () {
                 return '<div class="progress"><div class="progress-bar progress-bar-info" style="width:' + this["MemoryUsage"] + '%;"></div>' +
-                        '</div><div class="percent">' + this["MemoryUsage"] + '%</div>';
+                    '</div><div class="percent">' + this["MemoryUsage"] + '%</div>';
             }
         },
         CPUUsage: {
             html: function () {
                 return '<div class="progress"><div class="progress-bar progress-bar-info" style="width:' + this["CPUUsage"] + '%;"></div>' +
-                        '</div><div class="percent">' + this["CPUUsage"] + '%</div>';
+                    '</div><div class="percent">' + this["CPUUsage"] + '%</div>';
             }
         },
         Name: {
             html: function () {
-                return this["Name"].replace(/,/g, ",<wbr>").replace(/\s/g, " <wbr>").replace(/\./g, ".<wbr>").replace(/-/g, "<wbr>-").replace(/\//g, "<wbr>/"); /* split long name */
+                return this["Name"].replace(/,/g, ",<wbr>").replace(/\s/g, " <wbr>").replace(/\./g, ".<wbr>").replace(/-/g, "<wbr>-").replace(/\//g, "<wbr>/");
+                /* split long name */
             }
         }
     };
@@ -25,20 +26,20 @@ function renderPlugin_ps(data) {
         if (psitems.length > 0) {
 
             var html = "", ps_item = [], expanded = 0, memwas = false, cpuwas = false;
-            for (var i = 0; i < psitems.length ; i++) {
+            for (var i = 0; i < psitems.length; i++) {
                 ps_item = psitems[i]["@attributes"];
 
-                if (ps_item["ParentID"]==="0") {
-                    html+="<tr id=\"ps-" + (i+1) + "\" class=\"treegrid-ps-" + (i+1) + "\" style=\"display:none;\" >";
+                if (ps_item["ParentID"] === "0") {
+                    html += "<tr id=\"ps-" + (i + 1) + "\" class=\"treegrid-ps-" + (i + 1) + "\" style=\"display:none;\" >";
                 } else {
-                    html+="<tr id=\"ps-" + (i+1) + "\" class=\"treegrid-ps-" + (i+1) + " treegrid-parent-ps-" + ps_item["ParentID"] + "\" style=\"display:none;\" >";
+                    html += "<tr id=\"ps-" + (i + 1) + "\" class=\"treegrid-ps-" + (i + 1) + " treegrid-parent-ps-" + ps_item["ParentID"] + "\" style=\"display:none;\" >";
                 }
-                html+="<td><span class=\"treegrid-span\" data-bind=\"Name\"></span></td>";
-                html+="<td><span data-bind=\"PID\"></span></td>";
-                html+="<td><span data-bind=\"PPID\"></span></td>";
-                html+="<td style=\"width:10%;\"><span data-bind=\"MemoryUsage\"></span></td>";
-                html+="<td style=\"width:10%;\"><span data-bind=\"CPUUsage\"></span></td>";
-                html+="</tr>";
+                html += "<td><span class=\"treegrid-span\" data-bind=\"Name\"></span></td>";
+                html += "<td><span data-bind=\"PID\"></span></td>";
+                html += "<td><span data-bind=\"PPID\"></span></td>";
+                html += "<td style=\"width:10%;\"><span data-bind=\"MemoryUsage\"></span></td>";
+                html += "<td style=\"width:10%;\"><span data-bind=\"CPUUsage\"></span></td>";
+                html += "</tr>";
             }
 
             $("#ps-data").empty().append(html);
@@ -49,9 +50,9 @@ function renderPlugin_ps(data) {
                 expanderCollapsedClass: 'normalicon normalicon-right'
             });
 
-            for (var i = 0; i < psitems.length ; i++) {
+            for (var i = 0; i < psitems.length; i++) {
                 ps_item = psitems[i]["@attributes"];
-                $('#ps-'+(i+1)).render(ps_item, directives);
+                $('#ps-' + (i + 1)).render(ps_item, directives);
                 if (!memwas && (ps_item["MemoryUsage"] !== undefined)) {
                     memwas = true;
                 }
@@ -60,7 +61,7 @@ function renderPlugin_ps(data) {
                 }
                 expanded = ps_item["Expanded"];
                 if ((expanded !== undefined) && (expanded === "0")) {
-                    $('#ps-'+(i+1)).treegrid('collapse');
+                    $('#ps-' + (i + 1)).treegrid('collapse');
                 }
             }
 

@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.NetDevice.inc.php 547 2012-03-22 09:44:38Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * NetDevice TO class
  *
  * @category  PHP
@@ -23,50 +24,49 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class NetDevice
-{
+class NetDevice {
     /**
      * name of the device
      *
      * @var String
      */
     private $_name = "";
-
+    
     /**
      * transmitted bytes
      *
      * @var Integer
      */
     private $_txBytes = 0;
-
+    
     /**
      * received bytes
      *
      * @var Integer
      */
     private $_rxBytes = 0;
-
+    
     /**
      * counted error packages
      *
      * @var Integer
      */
     private $_errors = 0;
-
+    
     /**
      * counted droped packages
      *
      * @var Integer
      */
     private $_drops = 0;
-
+    
     /**
      * string with info
      *
      * @var String
      */
     private $_info = null;
-
+    
     /**
      * Returns $_drops.
      *
@@ -74,11 +74,10 @@ class NetDevice
      *
      * @return Integer
      */
-    public function getDrops()
-    {
+    public function getDrops () {
         return $this->_drops;
     }
-
+    
     /**
      * Sets $_drops.
      *
@@ -88,11 +87,10 @@ class NetDevice
      *
      * @return Void
      */
-    public function setDrops($drops)
-    {
+    public function setDrops ($drops) {
         $this->_drops = $drops;
     }
-
+    
     /**
      * Returns $_errors.
      *
@@ -100,11 +98,10 @@ class NetDevice
      *
      * @return Integer
      */
-    public function getErrors()
-    {
+    public function getErrors () {
         return $this->_errors;
     }
-
+    
     /**
      * Sets $_errors.
      *
@@ -114,11 +111,10 @@ class NetDevice
      *
      * @return Void
      */
-    public function setErrors($errors)
-    {
+    public function setErrors ($errors) {
         $this->_errors = $errors;
     }
-
+    
     /**
      * Returns $_name.
      *
@@ -126,11 +122,10 @@ class NetDevice
      *
      * @return String
      */
-    public function getName()
-    {
+    public function getName () {
         return $this->_name;
     }
-
+    
     /**
      * Sets $_name.
      *
@@ -140,11 +135,10 @@ class NetDevice
      *
      * @return Void
      */
-    public function setName($name)
-    {
+    public function setName ($name) {
         $this->_name = $name;
     }
-
+    
     /**
      * Returns $_rxBytes.
      *
@@ -152,11 +146,10 @@ class NetDevice
      *
      * @return Integer
      */
-    public function getRxBytes()
-    {
+    public function getRxBytes () {
         return $this->_rxBytes;
     }
-
+    
     /**
      * Sets $_rxBytes.
      *
@@ -166,11 +159,10 @@ class NetDevice
      *
      * @return Void
      */
-    public function setRxBytes($rxBytes)
-    {
+    public function setRxBytes ($rxBytes) {
         $this->_rxBytes = $rxBytes;
     }
-
+    
     /**
      * Returns $_txBytes.
      *
@@ -178,11 +170,10 @@ class NetDevice
      *
      * @return Integer
      */
-    public function getTxBytes()
-    {
+    public function getTxBytes () {
         return $this->_txBytes;
     }
-
+    
     /**
      * Sets $_txBytes.
      *
@@ -192,11 +183,10 @@ class NetDevice
      *
      * @return Void
      */
-    public function setTxBytes($txBytes)
-    {
+    public function setTxBytes ($txBytes) {
         $this->_txBytes = $txBytes;
     }
-
+    
     /**
      * Returns $_info.
      *
@@ -204,11 +194,10 @@ class NetDevice
      *
      * @return String
      */
-    public function getInfo()
-    {
+    public function getInfo () {
         return $this->_info;
     }
-
+    
     /**
      * Sets $_info.
      *
@@ -218,8 +207,7 @@ class NetDevice
      *
      * @return Void
      */
-    public function setInfo($info)
-    {
+    public function setInfo ($info) {
         $this->_info = $info;
     }
 }

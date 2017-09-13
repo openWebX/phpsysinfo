@@ -8,13 +8,14 @@
  * @return {jQuery} translation jQuery-Object
  */
 var langxml = [], langcounter = 1, langarr = [], current_language = "", plugins = [], blocks = [], plugin_liste = [],
-     showCPUListExpanded, showCPUInfoExpanded, showNetworkInfosExpanded, showNetworkActiveSpeed, showCPULoadCompact, oldnetwork = [], refrTimer;
+    showCPUListExpanded, showCPUInfoExpanded, showNetworkInfosExpanded, showNetworkActiveSpeed, showCPULoadCompact,
+    oldnetwork = [], refrTimer;
 
 /**
  * Fix PNG loading on IE6 or below
  */
 function PNGload(png) {
-    if (typeof(png.ifixpng)==='function') { //IE6 PNG fix
+    if (typeof(png.ifixpng) === 'function') { //IE6 PNG fix
         png.ifixpng('./gfx/blank.gif');
     }
 }
@@ -30,7 +31,7 @@ function createCookie(name, value, days) {
     var date = new Date(), expires = "";
     if (days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        if (typeof(date.toUTCString)==="function") {
+        if (typeof(date.toUTCString) === "function") {
             expires = "; expires=" + date.toUTCString();
         } else {
             //deprecated
@@ -218,7 +219,7 @@ function changeSpanLanguage(plugin) {
         $("#output").show();
     } else {
         langarrId += plugin;
-        $('span[id*=lang_plugin_'+plugin.toLowerCase()+'_]').each(function translate(i) {
+        $('span[id*=lang_plugin_' + plugin.toLowerCase() + '_]').each(function translate(i) {
             langId = this.getAttribute('id').substring(5);
             if (langId.indexOf('-') !== -1) {
                 langId = langId.substring(0, langId.indexOf('-')); //remove the unique identifier
@@ -230,7 +231,7 @@ function changeSpanLanguage(plugin) {
                 }
             }
         });
-        $('#panel_'+plugin.toLowerCase()).show(); //show plugin if any language loaded
+        $('#panel_' + plugin.toLowerCase()).show(); //show plugin if any language loaded
     }
 }
 
@@ -240,12 +241,13 @@ function reload(initiate) {
     $.ajax({
         dataType: "json",
         url: "xml.php?json",
-        error: function(jqXHR, status, thrownError) {;
+        error: function (jqXHR, status, thrownError) {
+            ;
             if ((status === "parsererror") && (typeof(xmlDoc = $.parseXML(jqXHR.responseText)) === "object")) {
                 var errs = 0;
                 try {
-                    $(xmlDoc).find("Error").each(function() {
-                        $("#errors").append("<li><b>"+$(this)[0]["attributes"]["Function"].nodeValue+"</b> - "+$(this)[0]["attributes"]["Message"].nodeValue.replace(/\n/g, "<br>")+"</li><br>");
+                    $(xmlDoc).find("Error").each(function () {
+                        $("#errors").append("<li><b>" + $(this)[0]["attributes"]["Function"].nodeValue + "</b> - " + $(this)[0]["attributes"]["Message"].nodeValue.replace(/\n/g, "<br>") + "</li><br>");
                         errs++;
                     });
                 }
@@ -260,11 +262,11 @@ function reload(initiate) {
 //            console.log(data);
 //            data_dbg = data;
             if ((typeof(initiate) === 'boolean') && (data["Options"] !== undefined) && (data["Options"]["@attributes"] !== undefined)
-               && ((refrtime = data["Options"]["@attributes"]["refresh"]) !== undefined) && (refrtime !== "0")) {
-                    if ((initiate === false) && (typeof(refrTimer) === 'number')) {
-                        clearInterval(refrTimer);
-                    }
-                    refrTimer = setInterval(reload, refrtime);
+                && ((refrtime = data["Options"]["@attributes"]["refresh"]) !== undefined) && (refrtime !== "0")) {
+                if ((initiate === false) && (typeof(refrTimer) === 'number')) {
+                    clearInterval(refrTimer);
+                }
+                refrTimer = setInterval(reload, refrtime);
             }
             renderErrors(data);
             renderVitals(data);
@@ -285,15 +287,15 @@ function reload(initiate) {
 
     for (var i = 0; i < plugins.length; i++) {
         plugin_request(plugins[i]);
-        if ($("#reload_"+plugins[i]).length > 0) {
-            $("#reload_"+plugins[i]).attr("title", "reload");
+        if ($("#reload_" + plugins[i]).length > 0) {
+            $("#reload_" + plugins[i]).attr("title", "reload");
         }
 
     }
     if ((typeof(initiate) === 'boolean') && (initiate === true)) {
         for (var i = 0; i < plugins.length; i++) {
-            if ($("#reload_"+plugins[i]).length > 0) {
-                $("#reload_"+plugins[i]).click(function() {
+            if ($("#reload_" + plugins[i]).length > 0) {
+                $("#reload_" + plugins[i]).click(function () {
                     plugin_request(this.id.substring(7)); //cut "reload_" from name
                     $(this).attr("title", datetime());
                 });
@@ -308,10 +310,10 @@ function reload(initiate) {
 function plugin_request(pluginname) {
 
     $.ajax({
-         dataType: "json",
-         url: "xml.php?plugin=" + pluginname + "&json",
-         pluginname: pluginname,
-         success: function (data) {
+        dataType: "json",
+        url: "xml.php?plugin=" + pluginname + "&json",
+        pluginname: pluginname,
+        success: function (data) {
             try {
                 // dynamic call
                 window['renderPlugin_' + this.pluginname](data);
@@ -338,28 +340,31 @@ $(document).ready(function () {
 
     sorttable.init();
 
-    showCPUListExpanded = $("#showCPUListExpanded").val().toString()==="true";
-    showCPUInfoExpanded = $("#showCPUInfoExpanded").val().toString()==="true";
-    showNetworkInfosExpanded = $("#showNetworkInfosExpanded").val().toString()==="true";
-    showCPULoadCompact = $("#showCPULoadCompact").val().toString()==="true";
+    showCPUListExpanded = $("#showCPUListExpanded").val().toString() === "true";
+    showCPUInfoExpanded = $("#showCPUInfoExpanded").val().toString() === "true";
+    showNetworkInfosExpanded = $("#showNetworkInfosExpanded").val().toString() === "true";
+    showCPULoadCompact = $("#showCPULoadCompact").val().toString() === "true";
     switch ($("#showNetworkActiveSpeed").val().toString()) {
-        case "bps":  showNetworkActiveSpeed = 2;
-                      break;
-        case "true": showNetworkActiveSpeed = 1;
-                      break;
-        default:     showNetworkActiveSpeed = 0;
+        case "bps":
+            showNetworkActiveSpeed = 2;
+            break;
+        case "true":
+            showNetworkActiveSpeed = 1;
+            break;
+        default:
+            showNetworkActiveSpeed = 0;
     }
 
     blocktmp = $("#blocks").val().toString();
-    if (blocktmp.length >0 ){
+    if (blocktmp.length > 0) {
         if (blocktmp === "true") {
             blocks[0] = "true";
         } else {
             blocks = blocktmp.split(',');
             var j = 0;
             for (var i = 0; i < blocks.length; i++) {
-                if ($("#block_"+blocks[i]).length > 0) {
-                    $("#output").children().eq(j).before($("#block_"+blocks[i]));
+                if ($("#block_" + blocks[i]).length > 0) {
+                    $("#output").children().eq(j).before($("#block_" + blocks[i]));
                     j++;
                 }
             }
@@ -367,21 +372,21 @@ $(document).ready(function () {
     }
 
     plugtmp = $("#plugins").val().toString();
-    if (plugtmp.length >0 ){
+    if (plugtmp.length > 0) {
         plugins = plugtmp.split(',');
     }
 
 
     if ($("#language option").length < 2) {
         current_language = $("#language").val().toString();
-/* not visible any objects
-        changeLanguage();
-*/
-/* plugin_liste not initialized yet
-        for (var i = 0; i < plugin_liste.length; i++) {
-            changeLanguage(plugin_liste[i]);
-        }
-*/
+        /* not visible any objects
+                changeLanguage();
+        */
+        /* plugin_liste not initialized yet
+                for (var i = 0; i < plugin_liste.length; i++) {
+                    changeLanguage(plugin_liste[i]);
+                }
+        */
     } else {
         cookie_language = readCookie("psi_language");
         if (cookie_language !== null) {
@@ -390,16 +395,16 @@ $(document).ready(function () {
         } else {
             current_language = $("#language").val().toString();
         }
-/* not visible any objects
-        changeLanguage();
-*/
-/* plugin_liste not initialized yet
-        for (var i = 0; i < plugin_liste.length; i++) {
-            changeLanguage(plugin_liste[i]);
-        }
-*/
+        /* not visible any objects
+                changeLanguage();
+        */
+        /* plugin_liste not initialized yet
+                for (var i = 0; i < plugin_liste.length; i++) {
+                    changeLanguage(plugin_liste[i]);
+                }
+        */
         $('#language').show();
-        $('span[id=lang_045]').show(); 
+        $('span[id=lang_045]').show();
         $("#language").change(function changeLang() {
             current_language = $("#language").val().toString();
             createCookie('psi_language', current_language, 365);
@@ -434,8 +439,8 @@ $(document).ready(function () {
     });
 });
 
-Array.prototype.push_attrs=function(element) {
-    for (var i = 0; i < element.length ; i++) {
+Array.prototype.push_attrs = function (element) {
+    for (var i = 0; i < element.length; i++) {
         this.push(element[i]["@attributes"]);
     }
     return i;
@@ -443,9 +448,9 @@ Array.prototype.push_attrs=function(element) {
 
 function items(data) {
     if (data !== undefined) {
-        if ((data.length > 0) &&  (data[0] !== undefined) && (data[0]["@attributes"] !== undefined)) {
+        if ((data.length > 0) && (data[0] !== undefined) && (data[0]["@attributes"] !== undefined)) {
             return data;
-        } else if (data["@attributes"] !== undefined ) {
+        } else if (data["@attributes"] !== undefined) {
             return [data];
         } else {
             return [];
@@ -472,20 +477,20 @@ function renderVitals(data) {
                 var lastboot;
                 var timestamp = 0;
                 var datetimeFormat;
-                if ((data["Generation"] !== undefined) && (data["Generation"]["@attributes"] !== undefined) && (data["Generation"]["@attributes"]["timestamp"] !== undefined) ) {
-                    timestamp = parseInt(data["Generation"]["@attributes"]["timestamp"])*1000; //server time
+                if ((data["Generation"] !== undefined) && (data["Generation"]["@attributes"] !== undefined) && (data["Generation"]["@attributes"]["timestamp"] !== undefined)) {
+                    timestamp = parseInt(data["Generation"]["@attributes"]["timestamp"]) * 1000; //server time
                     if (isNaN(timestamp)) timestamp = Number(new Date()); //client time
                 } else {
                     timestamp = Number(new Date()); //client time
                 }
-                lastboot = new Date(timestamp - (parseInt(this["Uptime"])*1000));
+                lastboot = new Date(timestamp - (parseInt(this["Uptime"]) * 1000));
                 if (((datetimeFormat = data["Options"]["@attributes"]["datetimeFormat"]) !== undefined) && (datetimeFormat.toLowerCase() === "locale")) {
                     return lastboot.toLocaleString();
                 } else {
                     if (typeof(lastboot.toUTCString) === "function") {
                         return lastboot.toUTCString();
                     } else {
-                    //deprecated
+                        //deprecated
                         return lastboot.toGMTString();
                     }
                 }
@@ -493,15 +498,15 @@ function renderVitals(data) {
         },
         Distro: {
             html: function () {
-                return '<img src="gfx/images/' + this["Distroicon"] + '" alt="" style="width:32px;height:32px;" onload="PNGload($(this));" />' + " " +this["Distro"]; //onload IE6 PNG fix
+                return '<img src="gfx/images/' + this["Distroicon"] + '" alt="" style="width:32px;height:32px;" onload="PNGload($(this));" />' + " " + this["Distro"]; //onload IE6 PNG fix
             }
         },
         LoadAvg: {
             html: function () {
                 if (this["CPULoad"] !== undefined) {
-                    return '<table style="width:100%;"><tr><td style="width:50%;">'+this["LoadAvg"] + '</td><td><div class="progress">' +
-                        '<div class="progress-bar progress-bar-info" style="width:' + round(this["CPULoad"],0) + '%;"></div>' +
-                        '</div><div class="percent">' + round(this["CPULoad"],0) + '%</div></td></tr></table>';
+                    return '<table style="width:100%;"><tr><td style="width:50%;">' + this["LoadAvg"] + '</td><td><div class="progress">' +
+                        '<div class="progress-bar progress-bar-info" style="width:' + round(this["CPULoad"], 0) + '%;"></div>' +
+                        '</div><div class="percent">' + round(this["CPULoad"], 0) + '%</div></td></tr></table>';
                 } else {
                     return this["LoadAvg"];
                 }
@@ -532,7 +537,7 @@ function renderVitals(data) {
                 }
                 if (p111 || p112 || p113 || p114 || p115 || p116) {
                     processes += " (";
-                    for (var proc_type in {111:0,112:1,113:2,114:3,115:4,116:5}) {
+                    for (var proc_type in {111: 0, 112: 1, 113: 2, 114: 3, 115: 4, 116: 5}) {
                         if (eval("p" + proc_type)) {
                             if (not_first) {
                                 processes += ", ";
@@ -611,20 +616,20 @@ function renderHardware(data) {
         Load: {
             html: function () {
                 return '<div class="progress">' +
-                        '<div class="progress-bar progress-bar-info" style="width:' + round(this["Load"],0) + '%;"></div>' +
-                        '</div><div class="percent">' + round(this["Load"],0) + '%</div>';
+                    '<div class="progress-bar progress-bar-info" style="width:' + round(this["Load"], 0) + '%;"></div>' +
+                    '</div><div class="percent">' + round(this["Load"], 0) + '%</div>';
             }
         }
     };
 
     var hw_directives = {
         hwName: {
-            html: function() {
+            html: function () {
                 return this["Name"];
             }
         },
         hwCount: {
-            text: function() {
+            text: function () {
                 if (this["Count"] == "1") {
                     return "";
                 }
@@ -633,44 +638,54 @@ function renderHardware(data) {
         }
     };
 
-    var html="";
+    var html = "";
 
     if ((data["Hardware"]["@attributes"] !== undefined) && (data["Hardware"]["@attributes"]["Name"] !== undefined)) {
-        html+="<tr id=\"hardware-Machine\">";
-        html+="<th style=\"width:8%;\">"+genlang(107, false)+"</th>"; //Machine
-        html+="<td><span data-bind=\"Name\"></span></td>";
-        html+="<td></td>";
-        html+="</tr>";
+        html += "<tr id=\"hardware-Machine\">";
+        html += "<th style=\"width:8%;\">" + genlang(107, false) + "</th>"; //Machine
+        html += "<td><span data-bind=\"Name\"></span></td>";
+        html += "<td></td>";
+        html += "</tr>";
     }
 
-    var paramlist = {CpuSpeed:13,CpuSpeedMax:100,CpuSpeedMin:101,Cache:15,Virt:94,BusSpeed:14,Bogomips:16,Cputemp:51,Load:9};
+    var paramlist = {
+        CpuSpeed: 13,
+        CpuSpeedMax: 100,
+        CpuSpeedMin: 101,
+        Cache: 15,
+        Virt: 94,
+        BusSpeed: 14,
+        Bogomips: 16,
+        Cputemp: 51,
+        Load: 9
+    };
     try {
         var datas = items(data["Hardware"]["CPU"]["CpuCore"]);
         for (var i = 0; i < datas.length; i++) {
-             if (i == 0) {
-                html+="<tr id=\"hardware-CPU\" class=\"treegrid-CPU\">";
-                html+="<th>CPU</th>";
-                html+="<td><span class=\"treegrid-span\">" + genlang(119, false) + ":</span></td>"; //Number of processors
-                html+="<td class=\"rightCell\"><span id=\"CPUCount\"></span></td>";
-                html+="</tr>";
+            if (i == 0) {
+                html += "<tr id=\"hardware-CPU\" class=\"treegrid-CPU\">";
+                html += "<th>CPU</th>";
+                html += "<td><span class=\"treegrid-span\">" + genlang(119, false) + ":</span></td>"; //Number of processors
+                html += "<td class=\"rightCell\"><span id=\"CPUCount\"></span></td>";
+                html += "</tr>";
             }
-            html+="<tr id=\"hardware-CPU-" + i +"\" class=\"treegrid-CPU-" + i +" treegrid-parent-CPU\">";
-            html+="<th></th>";
-            html+="<td><span class=\"treegrid-span\" data-bind=\"Model\"></span></td>";
+            html += "<tr id=\"hardware-CPU-" + i + "\" class=\"treegrid-CPU-" + i + " treegrid-parent-CPU\">";
+            html += "<th></th>";
+            html += "<td><span class=\"treegrid-span\" data-bind=\"Model\"></span></td>";
             if (showCPULoadCompact && (datas[i]["@attributes"]["Load"] !== undefined)) {
-                html+="<td style=\"width:15%;\" class=\"rightCell\"><span data-bind=\"Load\"></span></td>";
+                html += "<td style=\"width:15%;\" class=\"rightCell\"><span data-bind=\"Load\"></span></td>";
             } else {
-                html+="<td></td>";
+                html += "<td></td>";
             }
-            html+="</tr>";
+            html += "</tr>";
             for (var proc_param in paramlist) {
                 if (((proc_param !== 'Load') || !showCPULoadCompact)
-                   && (datas[i]["@attributes"][proc_param] !== undefined)) {
-                    html+="<tr id=\"hardware-CPU-" + i + "-" + proc_param + "\" class=\"treegrid-parent-CPU-" + i +"\">";
-                    html+="<th></th>";
-                    html+="<td><span class=\"treegrid-span\">" + genlang(paramlist[proc_param], true) + "<span></td>";
-                    html+="<td class=\"rightCell\"><span data-bind=\"" + proc_param + "\"></span></td>";
-                    html+="</tr>";
+                    && (datas[i]["@attributes"][proc_param] !== undefined)) {
+                    html += "<tr id=\"hardware-CPU-" + i + "-" + proc_param + "\" class=\"treegrid-parent-CPU-" + i + "\">";
+                    html += "<th></th>";
+                    html += "<td><span class=\"treegrid-span\">" + genlang(paramlist[proc_param], true) + "<span></td>";
+                    html += "<td class=\"rightCell\"><span data-bind=\"" + proc_param + "\"></span></td>";
+                    html += "</tr>";
                 }
             }
 
@@ -680,26 +695,26 @@ function renderHardware(data) {
         $("#hardware-CPU").hide();
     }
 
-    for (var hw_type in {PCI:0,IDE:1,SCSI:2,USB:3,TB:4,I2C:5}) {
+    for (var hw_type in {PCI: 0, IDE: 1, SCSI: 2, USB: 3, TB: 4, I2C: 5}) {
         try {
             var datas = items(data["Hardware"][hw_type]["Device"]);
             for (var i = 0; i < datas.length; i++) {
                 if (i == 0) {
-                    html+="<tr id=\"hardware-" + hw_type + "\" class=\"treegrid-" + hw_type + "\">";
-                    html+="<th>" + hw_type + "</th>";
-                    html+="<td><span class=\"treegrid-span\">" + genlang('120', true) + ":</span></td>"; //Number of devices
-                    html+="<td class=\"rightCell\"><span id=\"" + hw_type + "Count\"></span></td>";
-                    html+="</tr>";
+                    html += "<tr id=\"hardware-" + hw_type + "\" class=\"treegrid-" + hw_type + "\">";
+                    html += "<th>" + hw_type + "</th>";
+                    html += "<td><span class=\"treegrid-span\">" + genlang('120', true) + ":</span></td>"; //Number of devices
+                    html += "<td class=\"rightCell\"><span id=\"" + hw_type + "Count\"></span></td>";
+                    html += "</tr>";
                 }
-                html+="<tr id=\"hardware-" + hw_type + "-" + i +"\" class=\"treegrid-parent-" + hw_type + "\">";
-                html+="<th></th>";
-                html+="<td><span class=\"treegrid-span\" data-bind=\"hwName\"></span></td>";
-                html+="<td class=\"rightCell\"><span data-bind=\"hwCount\"></span></td>";
-                html+="</tr>";
+                html += "<tr id=\"hardware-" + hw_type + "-" + i + "\" class=\"treegrid-parent-" + hw_type + "\">";
+                html += "<th></th>";
+                html += "<td><span class=\"treegrid-span\" data-bind=\"hwName\"></span></td>";
+                html += "<td class=\"rightCell\"><span data-bind=\"hwCount\"></span></td>";
+                html += "</tr>";
             }
         }
         catch (err) {
-            $("#hardware-data"+hw_type).hide();
+            $("#hardware-data" + hw_type).hide();
         }
     }
     $("#hardware-data").empty().append(html);
@@ -712,11 +727,11 @@ function renderHardware(data) {
     try {
         var datas = items(data["Hardware"]["CPU"]["CpuCore"]);
         for (var i = 0; i < datas.length; i++) {
-            $('#hardware-CPU-'+ i).render(datas[i]["@attributes"], directives);
+            $('#hardware-CPU-' + i).render(datas[i]["@attributes"], directives);
             for (var proc_param in paramlist) {
                 if (((proc_param !== 'Load') || !showCPULoadCompact)
-                   && (datas[i]["@attributes"][proc_param] !== undefined)) {
-                    $('#hardware-CPU-'+ i +'-'+proc_param).render(datas[i]["@attributes"], directives);
+                    && (datas[i]["@attributes"][proc_param] !== undefined)) {
+                    $('#hardware-CPU-' + i + '-' + proc_param).render(datas[i]["@attributes"], directives);
                 }
             }
         }
@@ -728,12 +743,12 @@ function renderHardware(data) {
         $("#hardware-CPU").hide();
     }
 
-    for (var hw_type in {PCI:0,IDE:1,SCSI:2,USB:3,TB:4,I2C:5}) {
+    for (var hw_type in {PCI: 0, IDE: 1, SCSI: 2, USB: 3, TB: 4, I2C: 5}) {
         try {
             var licz = 0;
             var datas = items(data["Hardware"][hw_type]["Device"]);
             for (var i = 0; i < datas.length; i++) {
-                $('#hardware-'+hw_type+'-'+ i).render(datas[i]["@attributes"], hw_directives);
+                $('#hardware-' + hw_type + '-' + i).render(datas[i]["@attributes"], hw_directives);
                 if (datas[i]["@attributes"]["Count"] !== undefined) {
                     licz += parseInt(datas[i]["@attributes"]["Count"]);
                 } else {
@@ -745,7 +760,7 @@ function renderHardware(data) {
             }
         }
         catch (err) {
-            $("#hardware-"+hw_type).hide();
+            $("#hardware-" + hw_type).hide();
         }
     }
     $('#hardware').treegrid({
@@ -764,7 +779,7 @@ function renderHardware(data) {
         try {
             var datas = items(data["Hardware"]["CPU"]["CpuCore"]);
             for (var i = 0; i < datas.length; i++) {
-                $('#hardware-CPU-'+i).treegrid('expand');
+                $('#hardware-CPU-' + i).treegrid('expand');
             }
         }
         catch (err) {
@@ -823,7 +838,7 @@ function renderMemory(data) {
                     html += '<div class="percent">' + 'Total: ' + this["@attributes"]["Percent"] + '% ' + '<i>(';
                     var not_first = false;
                     if (this["Details"]["@attributes"]["AppPercent"] !== undefined) {
-                        html += genlang(64, false) + ': '+ this["Details"]["@attributes"]["AppPercent"] + '%'; //Kernel + apps
+                        html += genlang(64, false) + ': ' + this["Details"]["@attributes"]["AppPercent"] + '%'; //Kernel + apps
                         not_first = true;
                     }
                     if (this["Details"]["@attributes"]["CachedPercent"] !== undefined) {
@@ -936,7 +951,7 @@ function renderFilesystem(data) {
     try {
         var fs_data = [];
         var datas = items(data["FileSystem"]["Mount"]);
-        var total = {Total:0,Free:0,Used:0};
+        var total = {Total: 0, Free: 0, Used: 0};
         for (var i = 0; i < datas.length; i++) {
             fs_data.push(datas[i]["@attributes"]);
             total["Total"] += parseInt(datas[i]["@attributes"]["Total"]);
@@ -974,9 +989,9 @@ function renderNetwork(data) {
                     var diff, difftime;
                     if (((diff = this["RxBytes"] - oldnetwork[this["Name"]]["RxBytes"]) > 0) && ((difftime = data["Generation"]["@attributes"]["timestamp"] - oldnetwork[this["Name"]]["timestamp"]) > 0)) {
                         if (showNetworkActiveSpeed == 2) {
-                            htmladd ="<br><i>("+formatBPS(round(8*diff/difftime, 2))+")</i>";
+                            htmladd = "<br><i>(" + formatBPS(round(8 * diff / difftime, 2)) + ")</i>";
                         } else {
-                            htmladd ="<br><i>("+formatBytes(round(diff/difftime, 2), data["Options"]["@attributes"]["byteFormat"])+"/s)</i>";
+                            htmladd = "<br><i>(" + formatBytes(round(diff / difftime, 2), data["Options"]["@attributes"]["byteFormat"]) + "/s)</i>";
                         }
                     }
                 }
@@ -990,9 +1005,9 @@ function renderNetwork(data) {
                     var diff, difftime;
                     if (((diff = this["TxBytes"] - oldnetwork[this["Name"]]["TxBytes"]) > 0) && ((difftime = data["Generation"]["@attributes"]["timestamp"] - oldnetwork[this["Name"]]["timestamp"]) > 0)) {
                         if (showNetworkActiveSpeed == 2) {
-                            htmladd ="<br><i>("+formatBPS(round(8*diff/difftime, 2))+")</i>";
+                            htmladd = "<br><i>(" + formatBPS(round(8 * diff / difftime, 2)) + ")</i>";
                         } else {
-                            htmladd ="<br><i>("+formatBytes(round(diff/difftime, 2), data["Options"]["@attributes"]["byteFormat"])+"/s)</i>";
+                            htmladd = "<br><i>(" + formatBytes(round(diff / difftime, 2), data["Options"]["@attributes"]["byteFormat"]) + "/s)</i>";
                         }
                     }
                 }
@@ -1012,18 +1027,19 @@ function renderNetwork(data) {
     try {
         var datas = items(data["Network"]["NetDevice"]);
         for (var i = 0; i < datas.length; i++) {
-            html+="<tr id=\"network-" + i +"\" class=\"treegrid-network-" + i + "\">";
-            html+="<td><span class=\"treegrid-spanbold\" data-bind=\"Name\"></span></td>";
-            html+="<td class=\"rightCell\"><span data-bind=\"RxBytes\"></span></td>";
-            html+="<td class=\"rightCell\"><span data-bind=\"TxBytes\"></span></td>";
-            html+="<td class=\"rightCell\"><span data-bind=\"Drops\"></span></td>";
-            html+="</tr>";
+            html += "<tr id=\"network-" + i + "\" class=\"treegrid-network-" + i + "\">";
+            html += "<td><span class=\"treegrid-spanbold\" data-bind=\"Name\"></span></td>";
+            html += "<td class=\"rightCell\"><span data-bind=\"RxBytes\"></span></td>";
+            html += "<td class=\"rightCell\"><span data-bind=\"TxBytes\"></span></td>";
+            html += "<td class=\"rightCell\"><span data-bind=\"Drops\"></span></td>";
+            html += "</tr>";
 
-            var info  = datas[i]["@attributes"]["Info"];
-            if ( (info !== undefined) && (info !== "") ) {
-                var infos = info.replace(/:/g, "<wbr>:").split(";"); /* split long addresses */
-                for (var j = 0; j < infos.length; j++){
-                    html +="<tr class=\"treegrid-parent-network-" + i + "\"><td><span class=\"treegrid-span\">" + infos[j] + "</span></td><td></td><td></td><td></td></tr>";
+            var info = datas[i]["@attributes"]["Info"];
+            if ((info !== undefined) && (info !== "")) {
+                var infos = info.replace(/:/g, "<wbr>:").split(";");
+                /* split long addresses */
+                for (var j = 0; j < infos.length; j++) {
+                    html += "<tr class=\"treegrid-parent-network-" + i + "\"><td><span class=\"treegrid-span\">" + infos[j] + "</span></td><td></td><td></td><td></td></tr>";
                 }
             }
         }
@@ -1033,11 +1049,15 @@ function renderNetwork(data) {
                 $('#network-' + i).render(datas[i]["@attributes"], directives);
                 if (showNetworkActiveSpeed) {
                     preoldnetwork.pushIfNotExist(datas[i]["@attributes"]["Name"]);
-                    preoldnetwork[datas[i]["@attributes"]["Name"]] = {timestamp:data["Generation"]["@attributes"]["timestamp"], RxBytes:datas[i]["@attributes"]["RxBytes"], TxBytes:datas[i]["@attributes"]["TxBytes"]};
+                    preoldnetwork[datas[i]["@attributes"]["Name"]] = {
+                        timestamp: data["Generation"]["@attributes"]["timestamp"],
+                        RxBytes: datas[i]["@attributes"]["RxBytes"],
+                        TxBytes: datas[i]["@attributes"]["TxBytes"]
+                    };
                 }
             }
             $('#network').treegrid({
-                initialState: showNetworkInfosExpanded?'expanded':'collapsed',
+                initialState: showNetworkInfosExpanded ? 'expanded' : 'collapsed',
                 expanderExpandedClass: 'normalicon normalicon-down',
                 expanderCollapsedClass: 'normalicon normalicon-right'
             });
@@ -1052,7 +1072,7 @@ function renderNetwork(data) {
 
     if (showNetworkActiveSpeed) {
         while (oldnetwork.length > 0) {
-            delete oldnetwork[oldnetwork.length-1]; //remove last object
+            delete oldnetwork[oldnetwork.length - 1]; //remove last object
             oldnetwork.pop(); //remove last object reference from array
         }
         oldnetwork = preoldnetwork;
@@ -1068,19 +1088,19 @@ function renderVoltage(data) {
     var directives = {
         Value: {
             text: function () {
-                return round(this["Value"],2) + String.fromCharCode(160) + "V";
+                return round(this["Value"], 2) + String.fromCharCode(160) + "V";
             }
         },
         Min: {
             text: function () {
                 if (this["Min"] !== undefined)
-                    return round(this["Min"],2) + String.fromCharCode(160) + "V";
+                    return round(this["Min"], 2) + String.fromCharCode(160) + "V";
             }
         },
         Max: {
             text: function () {
                 if (this["Max"] !== undefined)
-                    return round(this["Max"],2) + String.fromCharCode(160) + "V";
+                    return round(this["Max"], 2) + String.fromCharCode(160) + "V";
             }
         },
         Label: {
@@ -1159,13 +1179,13 @@ function renderFans(data) {
     var directives = {
         Value: {
             html: function () {
-                return round(this["Value"],0) + String.fromCharCode(160) + genlang(63, true); //RPM
+                return round(this["Value"], 0) + String.fromCharCode(160) + genlang(63, true); //RPM
             }
         },
         Min: {
             html: function () {
                 if (this["Min"] !== undefined)
-                    return round(this["Min"],0) + String.fromCharCode(160) + genlang(63, true); //RPM
+                    return round(this["Min"], 0) + String.fromCharCode(160) + genlang(63, true); //RPM
             }
         },
         Label: {
@@ -1202,13 +1222,13 @@ function renderPower(data) {
     var directives = {
         Value: {
             text: function () {
-                return round(this["Value"],2) + String.fromCharCode(160) + "W";
+                return round(this["Value"], 2) + String.fromCharCode(160) + "W";
             }
         },
         Max: {
             text: function () {
                 if (this["Max"] !== undefined)
-                    return round(this["Max"],2) + String.fromCharCode(160) + "W";
+                    return round(this["Max"], 2) + String.fromCharCode(160) + "W";
             }
         },
         Label: {
@@ -1245,19 +1265,19 @@ function renderCurrent(data) {
     var directives = {
         Value: {
             text: function () {
-                return round(this["Value"],2) + String.fromCharCode(160) + "A";
+                return round(this["Value"], 2) + String.fromCharCode(160) + "A";
             }
         },
         Min: {
             text: function () {
                 if (this["Min"] !== undefined)
-                    return round(this["Min"],2) + String.fromCharCode(160) + "A";
+                    return round(this["Min"], 2) + String.fromCharCode(160) + "A";
             }
         },
         Max: {
             text: function () {
                 if (this["Max"] !== undefined)
-                    return round(this["Max"],2) + String.fromCharCode(160) + "A";
+                    return round(this["Max"], 2) + String.fromCharCode(160) + "A";
             }
         },
         Label: {
@@ -1336,12 +1356,13 @@ function renderUPS(data) {
         },
         LineFrequency: {
             html: function () {
-                return this["LineFrequency"] + String.fromCharCode(160)  + genlang(109, true); //Hz
+                return this["LineFrequency"] + String.fromCharCode(160) + genlang(109, true); //Hz
             }
         },
         BatteryVoltage: {
             html: function () {
-                return this["BatteryVoltage"] + String.fromCharCode(160) + genlang(82, true);; //V
+                return this["BatteryVoltage"] + String.fromCharCode(160) + genlang(82, true);
+                ; //V
             }
         },
         TimeLeftMinutes: {
@@ -1352,36 +1373,51 @@ function renderUPS(data) {
         LoadPercent: {
             html: function () {
                 return '<div class="progress">' +
-                        '<div class="progress-bar progress-bar-info" style="width:' + round(this["LoadPercent"],0) + '%;"></div>' +
-                        '</div><div class="percent">' + round(this["LoadPercent"],0) + '%</div>';
+                    '<div class="progress-bar progress-bar-info" style="width:' + round(this["LoadPercent"], 0) + '%;"></div>' +
+                    '</div><div class="percent">' + round(this["LoadPercent"], 0) + '%</div>';
             }
         },
         BatteryChargePercent: {
             html: function () {
                 return '<div class="progress">' +
-                        '<div class="progress-bar progress-bar-info" style="width:' + round(this["BatteryChargePercent"],0) + '%;"></div>' +
-                        '</div><div class="percent">' + round(this["BatteryChargePercent"],0) + '%</div>';
+                    '<div class="progress-bar progress-bar-info" style="width:' + round(this["BatteryChargePercent"], 0) + '%;"></div>' +
+                    '</div><div class="percent">' + round(this["BatteryChargePercent"], 0) + '%</div>';
             }
         }
     };
 
     if ((data["UPSInfo"] !== undefined) && (items(data["UPSInfo"]["UPS"]).length > 0)) {
-        var html="";
-        var paramlist = {Model:70,StartTime:72,Status:73,Temperature:84,OutagesCount:74,LastOutage:75,LastOutageFinish:76,LineVoltage:77,LineFrequency:108,LoadPercent:78,BatteryDate:104,BatteryVoltage:79,BatteryChargePercent:80,TimeLeftMinutes:81};
+        var html = "";
+        var paramlist = {
+            Model: 70,
+            StartTime: 72,
+            Status: 73,
+            Temperature: 84,
+            OutagesCount: 74,
+            LastOutage: 75,
+            LastOutageFinish: 76,
+            LineVoltage: 77,
+            LineFrequency: 108,
+            LoadPercent: 78,
+            BatteryDate: 104,
+            BatteryVoltage: 79,
+            BatteryChargePercent: 80,
+            TimeLeftMinutes: 81
+        };
 
         try {
             var datas = items(data["UPSInfo"]["UPS"]);
             for (var i = 0; i < datas.length; i++) {
-                html+="<tr id=\"ups-" + i +"\" class=\"treegrid-UPS-" + i+ "\">";
-                html+="<td style=\"width:60%;\"><span class=\"treegrid-spanbold\" data-bind=\"Name\"></span></td>";
-                html+="<td></td>";
-                html+="</tr>";
+                html += "<tr id=\"ups-" + i + "\" class=\"treegrid-UPS-" + i + "\">";
+                html += "<td style=\"width:60%;\"><span class=\"treegrid-spanbold\" data-bind=\"Name\"></span></td>";
+                html += "<td></td>";
+                html += "</tr>";
                 for (var proc_param in paramlist) {
                     if (datas[i]["@attributes"][proc_param] !== undefined) {
-                        html+="<tr id=\"ups-" + i + "-" + proc_param + "\" class=\"treegrid-parent-UPS-" + i +"\">";
-                        html+="<td><span class=\"treegrid-spanbold\">" + genlang(paramlist[proc_param], true) + "</span></td>";
-                        html+="<td class=\"rightCell\"><span data-bind=\"" + proc_param + "\"></span></td>";
-                        html+="</tr>";
+                        html += "<tr id=\"ups-" + i + "-" + proc_param + "\" class=\"treegrid-parent-UPS-" + i + "\">";
+                        html += "<td><span class=\"treegrid-spanbold\">" + genlang(paramlist[proc_param], true) + "</span></td>";
+                        html += "<td class=\"rightCell\"><span data-bind=\"" + proc_param + "\"></span></td>";
+                        html += "</tr>";
                     }
                 }
 
@@ -1391,10 +1427,10 @@ function renderUPS(data) {
         }
 
         if ((data["UPSInfo"]["@attributes"] !== undefined) && (data["UPSInfo"]["@attributes"]["ApcupsdCgiLinks"] === "1")) {
-            html+="<tr>";
-            html+="<td>(<a title='details' href='/cgi-bin/apcupsd/multimon.cgi' target='apcupsdcgi'>"+genlang(99, false)+"</a>)</td>";
-            html+="<td></td>";
-            html+="</tr>";
+            html += "<tr>";
+            html += "<td>(<a title='details' href='/cgi-bin/apcupsd/multimon.cgi' target='apcupsdcgi'>" + genlang(99, false) + "</a>)</td>";
+            html += "<td></td>";
+            html += "</tr>";
         }
 
         $("#ups-data").empty().append(html);
@@ -1402,10 +1438,10 @@ function renderUPS(data) {
         try {
             var datas = items(data["UPSInfo"]["UPS"]);
             for (var i = 0; i < datas.length; i++) {
-                $('#ups-'+ i).render(datas[i]["@attributes"], directives);
+                $('#ups-' + i).render(datas[i]["@attributes"], directives);
                 for (var proc_param in paramlist) {
                     if (datas[i]["@attributes"][proc_param] !== undefined) {
-                        $('#ups-'+ i +'-'+proc_param).render(datas[i]["@attributes"], directives);
+                        $('#ups-' + i + '-' + proc_param).render(datas[i]["@attributes"], directives);
                     }
                 }
             }
@@ -1429,7 +1465,7 @@ function renderErrors(data) {
     try {
         var datas = items(data["Errors"]["Error"]);
         for (var i = 0; i < datas.length; i++) {
-            $("#errors").append("<li><b>"+datas[i]["@attributes"]["Function"]+"</b> - "+datas[i]["@attributes"]["Message"].replace(/\n/g, "<br>")+"</li><br>");
+            $("#errors").append("<li><b>" + datas[i]["@attributes"]["Function"] + "</b> - " + datas[i]["@attributes"]["Message"].replace(/\n/g, "<br>") + "</li><br>");
         }
         if (i > 0) {
             $("#errorbutton").css("visibility", "visible");
@@ -1444,7 +1480,7 @@ function renderErrors(data) {
  * format seconds to a better readable statement with days, hours and minutes
  * @param {Number} sec seconds that should be formatted
  * @return {String} html string with no breaking spaces and translation statemen
-*/
+ */
 function formatUptime(sec) {
     var txt = "", intMin = 0, intHours = 0, intDays = 0;
     intMin = sec / 60;
@@ -1477,14 +1513,14 @@ function formatTemp(degreeC, tempFormat) {
         return "---";
     } else {
         switch (tempFormat.toLowerCase()) {
-        case "f":
-            return round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true);
-        case "c":
-            return round(degree, 1) + String.fromCharCode(160) + genlang(60, true);
-        case "c-f":
-            return round(degree, 1) + String.fromCharCode(160) + genlang(60, true) + "<br><i>(" + round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true) + ")</i>";
-        case "f-c":
-            return round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true) + "<br><i>(" + round(degree, 1) + String.fromCharCode(160) + genlang(60, true) + ")</i>";
+            case "f":
+                return round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true);
+            case "c":
+                return round(degree, 1) + String.fromCharCode(160) + genlang(60, true);
+            case "c-f":
+                return round(degree, 1) + String.fromCharCode(160) + genlang(60, true) + "<br><i>(" + round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true) + ")</i>";
+            case "f-c":
+                return round((((9 * degree) / 5) + 32), 1) + String.fromCharCode(160) + genlang(61, true) + "<br><i>(" + round(degree, 1) + String.fromCharCode(160) + genlang(60, true) + ")</i>";
         }
     }
 }
@@ -1522,107 +1558,107 @@ function formatBytes(bytes, byteFormat) {
     }
 
     switch (byteFormat.toLowerCase()) {
-    case "pib":
-        show += round(bytes / Math.pow(1024, 5), 2);
-        show += String.fromCharCode(160) + genlang(90, true);
-        break;
-    case "tib":
-        show += round(bytes / Math.pow(1024, 4), 2);
-        show += String.fromCharCode(160) + genlang(86, true);
-        break;
-    case "gib":
-        show += round(bytes / Math.pow(1024, 3), 2);
-        show += String.fromCharCode(160) + genlang(87, true);
-        break;
-    case "mib":
-        show += round(bytes / Math.pow(1024, 2), 2);
-        show += String.fromCharCode(160) + genlang(88, true);
-        break;
-    case "kib":
-        show += round(bytes / Math.pow(1024, 1), 2);
-        show += String.fromCharCode(160) + genlang(89, true);
-        break;
-    case "pb":
-        show += round(bytes / Math.pow(1000, 5), 2);
-        show += String.fromCharCode(160) + genlang(91, true);
-        break;
-    case "tb":
-        show += round(bytes / Math.pow(1000, 4), 2);
-        show += String.fromCharCode(160) + genlang(85, true);
-        break;
-    case "gb":
-        show += round(bytes / Math.pow(1000, 3), 2);
-        show += String.fromCharCode(160) + genlang(41, true);
-        break;
-    case "mb":
-        show += round(bytes / Math.pow(1000, 2), 2);
-        show += String.fromCharCode(160) + genlang(40, true);
-        break;
-    case "kb":
-        show += round(bytes / Math.pow(1000, 1), 2);
-        show += String.fromCharCode(160) + genlang(39, true);
-        break;
-    case "b":
-        show += bytes;
-        show += String.fromCharCode(160) + genlang(96, true);
-        break;
-    case "auto_decimal":
-        if (bytes > Math.pow(1000, 5)) {
-            show += round(bytes / Math.pow(1000, 5), 2);
-            show += String.fromCharCode(160) + genlang(91, true);
-        } else {
-            if (bytes > Math.pow(1000, 4)) {
-                show += round(bytes / Math.pow(1000, 4), 2);
-                show += String.fromCharCode(160) + genlang(85, true);
-            } else {
-                if (bytes > Math.pow(1000, 3)) {
-                    show += round(bytes / Math.pow(1000, 3), 2);
-                    show += String.fromCharCode(160) + genlang(41, true);
-                } else {
-                    if (bytes > Math.pow(1000, 2)) {
-                        show += round(bytes / Math.pow(1000, 2), 2);
-                        show += String.fromCharCode(160) + genlang(40, true);
-                    } else {
-                        if (bytes > Math.pow(1000, 1)) {
-                            show += round(bytes / Math.pow(1000, 1), 2);
-                            show += String.fromCharCode(160) + genlang(39, true);
-                        } else {
-                                show += bytes;
-                                show += String.fromCharCode(160) + genlang(96, true);
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        if (bytes > Math.pow(1024, 5)) {
+        case "pib":
             show += round(bytes / Math.pow(1024, 5), 2);
             show += String.fromCharCode(160) + genlang(90, true);
-        } else {
-            if (bytes > Math.pow(1024, 4)) {
-                show += round(bytes / Math.pow(1024, 4), 2);
-                show += String.fromCharCode(160) + genlang(86, true);
+            break;
+        case "tib":
+            show += round(bytes / Math.pow(1024, 4), 2);
+            show += String.fromCharCode(160) + genlang(86, true);
+            break;
+        case "gib":
+            show += round(bytes / Math.pow(1024, 3), 2);
+            show += String.fromCharCode(160) + genlang(87, true);
+            break;
+        case "mib":
+            show += round(bytes / Math.pow(1024, 2), 2);
+            show += String.fromCharCode(160) + genlang(88, true);
+            break;
+        case "kib":
+            show += round(bytes / Math.pow(1024, 1), 2);
+            show += String.fromCharCode(160) + genlang(89, true);
+            break;
+        case "pb":
+            show += round(bytes / Math.pow(1000, 5), 2);
+            show += String.fromCharCode(160) + genlang(91, true);
+            break;
+        case "tb":
+            show += round(bytes / Math.pow(1000, 4), 2);
+            show += String.fromCharCode(160) + genlang(85, true);
+            break;
+        case "gb":
+            show += round(bytes / Math.pow(1000, 3), 2);
+            show += String.fromCharCode(160) + genlang(41, true);
+            break;
+        case "mb":
+            show += round(bytes / Math.pow(1000, 2), 2);
+            show += String.fromCharCode(160) + genlang(40, true);
+            break;
+        case "kb":
+            show += round(bytes / Math.pow(1000, 1), 2);
+            show += String.fromCharCode(160) + genlang(39, true);
+            break;
+        case "b":
+            show += bytes;
+            show += String.fromCharCode(160) + genlang(96, true);
+            break;
+        case "auto_decimal":
+            if (bytes > Math.pow(1000, 5)) {
+                show += round(bytes / Math.pow(1000, 5), 2);
+                show += String.fromCharCode(160) + genlang(91, true);
             } else {
-                if (bytes > Math.pow(1024, 3)) {
-                    show += round(bytes / Math.pow(1024, 3), 2);
-                    show += String.fromCharCode(160) + genlang(87, true);
+                if (bytes > Math.pow(1000, 4)) {
+                    show += round(bytes / Math.pow(1000, 4), 2);
+                    show += String.fromCharCode(160) + genlang(85, true);
                 } else {
-                    if (bytes > Math.pow(1024, 2)) {
-                        show += round(bytes / Math.pow(1024, 2), 2);
-                        show += String.fromCharCode(160) + genlang(88, true);
+                    if (bytes > Math.pow(1000, 3)) {
+                        show += round(bytes / Math.pow(1000, 3), 2);
+                        show += String.fromCharCode(160) + genlang(41, true);
                     } else {
-                        if (bytes > Math.pow(1024, 1)) {
-                            show += round(bytes / Math.pow(1024, 1), 2);
-                            show += String.fromCharCode(160) + genlang(89, true);
+                        if (bytes > Math.pow(1000, 2)) {
+                            show += round(bytes / Math.pow(1000, 2), 2);
+                            show += String.fromCharCode(160) + genlang(40, true);
                         } else {
-                            show += bytes;
-                            show += String.fromCharCode(160) + genlang(96, true);
+                            if (bytes > Math.pow(1000, 1)) {
+                                show += round(bytes / Math.pow(1000, 1), 2);
+                                show += String.fromCharCode(160) + genlang(39, true);
+                            } else {
+                                show += bytes;
+                                show += String.fromCharCode(160) + genlang(96, true);
+                            }
                         }
                     }
                 }
             }
-        }
+            break;
+        default:
+            if (bytes > Math.pow(1024, 5)) {
+                show += round(bytes / Math.pow(1024, 5), 2);
+                show += String.fromCharCode(160) + genlang(90, true);
+            } else {
+                if (bytes > Math.pow(1024, 4)) {
+                    show += round(bytes / Math.pow(1024, 4), 2);
+                    show += String.fromCharCode(160) + genlang(86, true);
+                } else {
+                    if (bytes > Math.pow(1024, 3)) {
+                        show += round(bytes / Math.pow(1024, 3), 2);
+                        show += String.fromCharCode(160) + genlang(87, true);
+                    } else {
+                        if (bytes > Math.pow(1024, 2)) {
+                            show += round(bytes / Math.pow(1024, 2), 2);
+                            show += String.fromCharCode(160) + genlang(88, true);
+                        } else {
+                            if (bytes > Math.pow(1024, 1)) {
+                                show += round(bytes / Math.pow(1024, 1), 2);
+                                show += String.fromCharCode(160) + genlang(89, true);
+                            } else {
+                                show += bytes;
+                                show += String.fromCharCode(160) + genlang(96, true);
+                            }
+                        }
+                    }
+                }
+            }
     }
     return show;
 }
@@ -1650,8 +1686,8 @@ function formatBPS(bps) {
                         show += round(bps / Math.pow(1000, 1), 2);
                         show += String.fromCharCode(160) + 'Kb/s';
                     } else {
-                            show += bps;
-                            show += String.fromCharCode(160) + 'b/s';
+                        show += bps;
+                        show += String.fromCharCode(160) + 'b/s';
                     }
                 }
             }
@@ -1660,7 +1696,7 @@ function formatBPS(bps) {
     return show;
 }
 
-Array.prototype.pushIfNotExist = function(val) {
+Array.prototype.pushIfNotExist = function (val) {
     if (typeof(val) == 'undefined' || val == '') {
         return;
     }
@@ -1675,7 +1711,8 @@ Array.prototype.pushIfNotExist = function(val) {
  * @return {String} formatted datetime string
  */
 function datetime() {
-    var date, day = 0, month = 0, year = 0, hour = 0, minute = 0, days = "", months = "", years = "", hours = "", minutes = "";
+    var date, day = 0, month = 0, year = 0, hour = 0, minute = 0, days = "", months = "", years = "", hours = "",
+        minutes = "";
     date = new Date();
     day = date.getDate();
     month = date.getMonth() + 1;

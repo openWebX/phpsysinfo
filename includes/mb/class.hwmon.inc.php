@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.hwmon.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting hardware temperature information through sysctl
  *
  * @category  PHP
@@ -24,22 +25,41 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Hwmon extends Sensors
-{
+class Hwmon extends Sensors {
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_Sensor::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $hwpaths = glob("/sys/class/hwmon/hwmon*/device/", GLOB_NOSORT);
+        if (($totalh = count($hwpaths)) > 0) {
+            for ($h = 0; $h < $totalh; $h++) {
+                $this->_temperature($hwpaths[$h]);
+                $this->_voltage($hwpaths[$h]);
+                $this->_fans($hwpaths[$h]);
+                $this->_power($hwpaths[$h]);
+                $this->_current($hwpaths[$h]);
+            }
+        }
+    }
+    
     /**
      * get temperature information
      *
      * @param string $hwpath
+     *
      * @return void
      */
-    private function _temperature($hwpath)
-    {
-       $sensor = glob($hwpath."temp*_input", GLOB_NOSORT);
-       if (($total = count($sensor)) > 0) {
+    private function _temperature ($hwpath) {
+        $sensor = glob($hwpath . "temp*_input", GLOB_NOSORT);
+        if (($total = count($sensor)) > 0) {
             $buf = "";
             for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($sensor[$i], $buf, 1, 4096, false) && (trim($buf) != "")) {
                 $dev = new SensorDevice();
-                $dev->setValue(trim($buf)/1000);
+                $dev->setValue(trim($buf) / 1000);
                 $label = preg_replace("/_input$/", "_label", $sensor[$i]);
                 $crit = preg_replace("/_input$/", "_crit", $sensor[$i]);
                 $max = preg_replace("/_input$/", "_max", $sensor[$i]);
@@ -55,32 +75,32 @@ class Hwmon extends Sensors
                     }
                 }
                 if (CommonFunctions::fileexists($crit) && CommonFunctions::rfts($crit, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMax(trim($buf)/1000);
+                    $dev->setMax(trim($buf) / 1000);
                     if (CommonFunctions::fileexists($crit_alarm) && CommonFunctions::rfts($crit_alarm, $buf, 1, 4096, false) && (trim($buf) === "1")) {
                         $dev->setEvent("Critical Alarm");
                     }
                 } elseif (CommonFunctions::fileexists($max) && CommonFunctions::rfts($max, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMax(trim($buf)/1000);
+                    $dev->setMax(trim($buf) / 1000);
                 }
                 $this->mbinfo->setMbTemp($dev);
             }
         }
     }
-
+    
     /**
      * get voltage information
      *
      * @param string $hwpath
+     *
      * @return void
      */
-    private function _voltage($hwpath)
-    {
-       $sensor = glob($hwpath."in*_input", GLOB_NOSORT);
-       if (($total = count($sensor)) > 0) {
+    private function _voltage ($hwpath) {
+        $sensor = glob($hwpath . "in*_input", GLOB_NOSORT);
+        if (($total = count($sensor)) > 0) {
             $buf = "";
             for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($sensor[$i], $buf, 1, 4096, false) && (trim($buf) != "")) {
                 $dev = new SensorDevice();
-                $dev->setValue(trim($buf)/1000);
+                $dev->setValue(trim($buf) / 1000);
                 $label = preg_replace("/_input$/", "_label", $sensor[$i]);
                 $alarm = preg_replace("/_input$/", "_alarm", $sensor[$i]);
                 $max = preg_replace("/_input$/", "_max", $sensor[$i]);
@@ -96,10 +116,10 @@ class Hwmon extends Sensors
                     }
                 }
                 if (CommonFunctions::fileexists($max) && CommonFunctions::rfts($max, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMax(trim($buf)/1000);
+                    $dev->setMax(trim($buf) / 1000);
                 }
                 if (CommonFunctions::fileexists($min) && CommonFunctions::rfts($min, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMin(trim($buf)/1000);
+                    $dev->setMin(trim($buf) / 1000);
                 }
                 if (CommonFunctions::fileexists($alarm) && CommonFunctions::rfts($alarm, $buf, 1, 4096, false) && (trim($buf) === "1")) {
                     $dev->setEvent("Alarm");
@@ -108,17 +128,17 @@ class Hwmon extends Sensors
             }
         }
     }
-
+    
     /**
      * get fan information
      *
      * @param string $hwpath
+     *
      * @return void
      */
-    private function _fans($hwpath)
-    {
-       $sensor = glob($hwpath."fan*_input", GLOB_NOSORT);
-       if (($total = count($sensor)) > 0) {
+    private function _fans ($hwpath) {
+        $sensor = glob($hwpath . "fan*_input", GLOB_NOSORT);
+        if (($total = count($sensor)) > 0) {
             $buf = "";
             for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($sensor[$i], $buf, 1, 4096, false) && (trim($buf) != "")) {
                 $dev = new SensorDevice();
@@ -153,21 +173,21 @@ class Hwmon extends Sensors
             }
         }
     }
-
+    
     /**
      * get power information
      *
      * @param string $hwpath
+     *
      * @return void
      */
-    private function _power($hwpath)
-    {
-       $sensor = glob($hwpath."power*_input", GLOB_NOSORT);
-       if (($total = count($sensor)) > 0) {
+    private function _power ($hwpath) {
+        $sensor = glob($hwpath . "power*_input", GLOB_NOSORT);
+        if (($total = count($sensor)) > 0) {
             $buf = "";
             for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($sensor[$i], $buf, 1, 4096, false) && (trim($buf) != "")) {
                 $dev = new SensorDevice();
-                $dev->setValue(trim($buf)/1000000);
+                $dev->setValue(trim($buf) / 1000000);
                 $label = preg_replace("/_input$/", "_label", $sensor[$i]);
                 $alarm = preg_replace("/_input$/", "_alarm", $sensor[$i]);
                 $max = preg_replace("/_input$/", "_max", $sensor[$i]);
@@ -183,10 +203,10 @@ class Hwmon extends Sensors
                     }
                 }
                 if (CommonFunctions::fileexists($max) && CommonFunctions::rfts($max, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMax(trim($buf)/1000000);
+                    $dev->setMax(trim($buf) / 1000000);
                 }
                 if (CommonFunctions::fileexists($min) && CommonFunctions::rfts($min, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMin(trim($buf)/1000000);
+                    $dev->setMin(trim($buf) / 1000000);
                 }
                 if (CommonFunctions::fileexists($alarm) && CommonFunctions::rfts($alarm, $buf, 1, 4096, false) && (trim($buf) === "1")) {
                     $dev->setEvent("Alarm");
@@ -195,21 +215,21 @@ class Hwmon extends Sensors
             }
         }
     }
-
+    
     /**
      * get current information
      *
      * @param string $hwpath
+     *
      * @return void
      */
-    private function _current($hwpath)
-    {
-       $sensor = glob($hwpath."curr*_input", GLOB_NOSORT);
-       if (($total = count($sensor)) > 0) {
+    private function _current ($hwpath) {
+        $sensor = glob($hwpath . "curr*_input", GLOB_NOSORT);
+        if (($total = count($sensor)) > 0) {
             $buf = "";
             for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($sensor[$i], $buf, 1, 4096, false) && (trim($buf) != "")) {
                 $dev = new SensorDevice();
-                $dev->setValue(trim($buf)/1000);
+                $dev->setValue(trim($buf) / 1000);
                 $label = preg_replace("/_input$/", "_label", $sensor[$i]);
                 $alarm = preg_replace("/_input$/", "_alarm", $sensor[$i]);
                 $max = preg_replace("/_input$/", "_max", $sensor[$i]);
@@ -225,10 +245,10 @@ class Hwmon extends Sensors
                     }
                 }
                 if (CommonFunctions::fileexists($max) && CommonFunctions::rfts($max, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMax(trim($buf)/1000);
+                    $dev->setMax(trim($buf) / 1000);
                 }
                 if (CommonFunctions::fileexists($min) && CommonFunctions::rfts($min, $buf, 1, 4096, false) && (trim($buf) != "")) {
-                    $dev->setMin(trim($buf)/1000);
+                    $dev->setMin(trim($buf) / 1000);
                 }
                 if (CommonFunctions::fileexists($alarm) && CommonFunctions::rfts($alarm, $buf, 1, 4096, false) && (trim($buf) === "1")) {
                     $dev->setEvent("Alarm");
@@ -236,26 +256,5 @@ class Hwmon extends Sensors
                 $this->mbinfo->setMbCurrent($dev);
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_Sensor::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-       $hwpaths = glob("/sys/class/hwmon/hwmon*/device/", GLOB_NOSORT);
-       if (($totalh = count($hwpaths)) > 0) {
-            for ($h = 0; $h < $totalh; $h++) {
-                $this->_temperature($hwpaths[$h]);
-                $this->_voltage($hwpaths[$h]);
-                $this->_fans($hwpaths[$h]);
-                $this->_power($hwpaths[$h]);
-                $this->_current($hwpaths[$h]);
-            }
-       }
     }
 }

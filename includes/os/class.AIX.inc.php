@@ -12,29 +12,73 @@
  * @version   SVN: $Id: class.AIX.inc.php 287 2009-06-26 12:11:59Z Krzysztof Paz, IBM POLSKA
  * @link      http://phpsysinfo.sourceforge.net
  */
+
 /**
-* IBM AIX sysinfo class
-* get all the required information from IBM AIX system
-*
-* @category  PHP
-* @package   PSI AIX OS class
-* @author    Krzysztof Paz (kpaz@gazeta.pl) based on Michael Cramer <BigMichi1@users.sourceforge.net>
-* @copyright 2011 Krzysztof Paz
-* @license   http://opensource.org/licenses/gpl-2.0.php GNU General Public License version 2, or (at your option) any later version
-* @version   Release: 3.0
-* @link      http://phpsysinfo.sourceforge.net
-*/
-class AIX extends OS
-{
-
-    private $_aixdata = array();
-
+ * IBM AIX sysinfo class
+ * get all the required information from IBM AIX system
+ *
+ * @category  PHP
+ * @package   PSI AIX OS class
+ * @author    Krzysztof Paz (kpaz@gazeta.pl) based on Michael Cramer <BigMichi1@users.sourceforge.net>
+ * @copyright 2011 Krzysztof Paz
+ * @license   http://opensource.org/licenses/gpl-2.0.php GNU General Public License version 2, or (at your option) any later version
+ * @version   Release: 3.0
+ * @link      http://phpsysinfo.sourceforge.net
+ */
+class AIX extends OS {
+    
+    private $_aixdata = [];
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_OS::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->error->addError("WARN", "The AIX version of phpSysInfo is a work in progress, some things currently don't work");
+        if (!defined('PSI_ONLY') || PSI_ONLY === 'vitals') {
+            $this->_distro();
+            $this->_hostname();
+            $this->_kernel();
+            $this->_uptime();
+            $this->_users();
+            $this->_loadavg();
+        }
+        if (!defined('PSI_ONLY') || PSI_ONLY === 'hardware') {
+            $this->_cpuinfo();
+            $this->_pci();
+            $this->_ide();
+            $this->_scsi();
+            $this->_usb();
+        }
+        if (!defined('PSI_ONLY') || PSI_ONLY === 'network') {
+            $this->_network();
+        }
+        if (!defined('PSI_ONLY') || PSI_ONLY === 'memory') {
+            $this->_memory();
+        }
+        if (!defined('PSI_ONLY') || PSI_ONLY === 'filesystem') {
+            $this->_filesystems();
+        }
+    }
+    
+    /**
+     * Distribution
+     *
+     * @return void
+     */
+    private function _distro () {
+        $this->sys->setDistribution('IBM AIX');
+        $this->sys->setDistributionIcon('AIX.png');
+    }
+    
     /**
      * Virtual Host Name
      * @return void
      */
-    private function _hostname()
-    {
+    private function _hostname () {
         /*   if (PSI_USE_VHOST === true) {
                $this->sys->setHostname(getenv('SERVER_NAME'));
            } else {
@@ -43,27 +87,25 @@ class AIX extends OS
                }
            } */
         $this->sys->setHostname(getenv('SERVER_NAME'));
-
+        
     }
-
+    
     /**
      * IBM AIX Version
      * @return void
      */
-    private function _kernel()
-    {
+    private function _kernel () {
         if (CommonFunctions::executeProgram('oslevel', '', $ret1) && CommonFunctions::executeProgram('oslevel', '-s', $ret2)) {
             $this->sys->setKernel($ret1 . '   (' . $ret2 . ')');
         }
     }
-
+    
     /**
      * UpTime
      * time the system is running
      * @return void
      */
-    private function _uptime()
-    {
+    private function _uptime () {
         if (CommonFunctions::executeProgram('uptime', '', $buf)) {
             if (preg_match("/up (\d+) days,\s*(\d+):(\d+),/", $buf, $ar_buf) || preg_match("/up (\d+) day,\s*(\d+):(\d+),/", $buf, $ar_buf)) {
                 $min = $ar_buf[3];
@@ -73,28 +115,26 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * Processor Load
      * optionally create a loadbar
      * @return void
      */
-    private function _loadavg()
-    {
+    private function _loadavg () {
         if (CommonFunctions::executeProgram('uptime', '', $buf)) {
             if (preg_match("/average: (.*), (.*), (.*)$/", $buf, $ar_buf)) {
-                $this->sys->setLoad($ar_buf[1].' '.$ar_buf[2].' '.$ar_buf[3]);
+                $this->sys->setLoad($ar_buf[1] . ' ' . $ar_buf[2] . ' ' . $ar_buf[3]);
             }
         }
     }
-
+    
     /**
      * CPU information
      * All of the tags here are highly architecture dependant
      * @return void
      */
-    private function _cpuinfo()
-    {
+    private function _cpuinfo () {
         $ncpu = 0;
         $tcpu = "";
         $vcpu = "";
@@ -121,8 +161,8 @@ class AIX extends OS
             $dev = new CpuDevice();
             if (trim($tcpu) != "") {
                 $cpu = trim($tcpu);
-                if (trim($vcpu) != "") $cpu .= " ".trim($vcpu);
-                if (trim($ccpu) != "") $cpu .= " ".trim($ccpu);
+                if (trim($vcpu) != "") $cpu .= " " . trim($vcpu);
+                if (trim($ccpu) != "") $cpu .= " " . trim($ccpu);
                 $dev->setModel($cpu);
             }
             if (trim($scpu) != "") {
@@ -131,13 +171,26 @@ class AIX extends OS
             $this->sys->setCpus($dev);
         }
     }
-
+    
+    /**
+     * IBM AIX informations by K.PAZ
+     * @return array
+     */
+    private function readaixdata () {
+        if (count($this->_aixdata) === 0) {
+            if (CommonFunctions::executeProgram('prtconf', '', $bufr)) {
+                $this->_aixdata = preg_split("/\n/", $bufr, -1, PREG_SPLIT_NO_EMPTY);
+            }
+        }
+        
+        return $this->_aixdata;
+    }
+    
     /**
      * PCI devices
      * @return void
      */
-    private function _pci()
-    {
+    private function _pci () {
         foreach ($this->readaixdata() as $line) {
             if (preg_match("/^[\*\+]\s\S+\s+\S+\s+(.*PCI.*)/", $line, $ar_buf)) {
                 $dev = new HWDevice();
@@ -146,13 +199,12 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * IDE devices
      * @return void
      */
-    private function _ide()
-    {
+    private function _ide () {
         foreach ($this->readaixdata() as $line) {
             if (preg_match("/^[\*\+]\s\S+\s+\S+\s+(.*IDE.*)/", $line, $ar_buf)) {
                 $dev = new HWDevice();
@@ -161,13 +213,12 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * SCSI devices
      * @return void
      */
-    private function _scsi()
-    {
+    private function _scsi () {
         foreach ($this->readaixdata() as $line) {
             if (preg_match("/^[\*\+]\s\S+\s+\S+\s+(.*SCSI.*)/", $line, $ar_buf)) {
                 $dev = new HWDevice();
@@ -176,13 +227,12 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * USB devices
      * @return void
      */
-    private function _usb()
-    {
+    private function _usb () {
         foreach ($this->readaixdata() as $line) {
             if (preg_match("/^[\*\+]\s\S+\s+\S+\s+(.*USB.*)/", $line, $ar_buf)) {
                 $dev = new HWDevice();
@@ -191,19 +241,18 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * Network devices
      * includes also rx/tx bytes
      * @return void
      */
-    private function _network()
-    {
+    private function _network () {
         if (CommonFunctions::executeProgram('netstat', '-ni | tail -n +2', $netstat)) {
             $lines = preg_split("/\n/", $netstat, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($lines as $line) {
                 $ar_buf = preg_split("/\s+/", $line);
-                if (! empty($ar_buf[0]) && ! empty($ar_buf[3])) {
+                if (!empty($ar_buf[0]) && !empty($ar_buf[3])) {
                     $dev = new NetDevice();
                     $dev->setName($ar_buf[0]);
                     $dev->setRxBytes($ar_buf[4]);
@@ -215,13 +264,12 @@ class AIX extends OS
             }
         }
     }
-
+    
     /**
      * Physical memory information and Swap Space information
      * @return void
      */
-    private function _memory()
-    {
+    private function _memory () {
         $mems = "";
         $tswap = "";
         $pswap = "";
@@ -237,13 +285,13 @@ class AIX extends OS
             }
         }
         if (trim($mems) != "") {
-            $mems = $mems*1024*1024;
+            $mems = $mems * 1024 * 1024;
             $this->sys->setMemTotal($mems);
             $memu = 0;
             $memf = 0;
             if (CommonFunctions::executeProgram('svmon', '-G', $buf)) {
                 if (preg_match("/^memory\s+\d+\s+(\d+)\s+/", $buf, $ar_buf)) {
-                    $memu = $ar_buf[1]*1024*4;
+                    $memu = $ar_buf[1] * 1024 * 4;
                     $memf = $mems - $memu;
                 }
             }
@@ -265,14 +313,13 @@ class AIX extends OS
             $this->sys->setSwapDevices($dev);
         }
     }
-
+    
     /**
      * filesystem information
      *
      * @return void
      */
-    private function _filesystems()
-    {
+    private function _filesystems () {
         if (CommonFunctions::executeProgram('df', '-kP', $df, PSI_DEBUG)) {
             $mounts = preg_split("/\n/", $df, -1, PREG_SPLIT_NO_EMPTY);
             if (CommonFunctions::executeProgram('mount', '-v', $s, PSI_DEBUG)) {
@@ -295,68 +342,6 @@ class AIX extends OS
                 }
                 $this->sys->setDiskDevices($dev);
             }
-        }
-    }
-
-    /**
-     * Distribution
-     *
-     * @return void
-     */
-    private function _distro()
-    {
-        $this->sys->setDistribution('IBM AIX');
-        $this->sys->setDistributionIcon('AIX.png');
-    }
-
-    /**
-     * IBM AIX informations by K.PAZ
-     * @return array
-     */
-    private function readaixdata()
-    {
-        if (count($this->_aixdata) === 0) {
-            if (CommonFunctions::executeProgram('prtconf', '', $bufr)) {
-                $this->_aixdata = preg_split("/\n/", $bufr, -1, PREG_SPLIT_NO_EMPTY);
-            }
-        }
-
-        return $this->_aixdata;
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_OS::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->error->addError("WARN", "The AIX version of phpSysInfo is a work in progress, some things currently don't work");
-        if (!defined('PSI_ONLY') || PSI_ONLY==='vitals') {
-            $this->_distro();
-            $this->_hostname();
-            $this->_kernel();
-            $this->_uptime();
-            $this->_users();
-            $this->_loadavg();
-        }
-        if (!defined('PSI_ONLY') || PSI_ONLY==='hardware') {
-            $this->_cpuinfo();
-            $this->_pci();
-            $this->_ide();
-            $this->_scsi();
-            $this->_usb();
-        }
-        if (!defined('PSI_ONLY') || PSI_ONLY==='network') {
-            $this->_network();
-        }
-        if (!defined('PSI_ONLY') || PSI_ONLY==='memory') {
-            $this->_memory();
-        }
-        if (!defined('PSI_ONLY') || PSI_ONLY==='filesystem') {
-            $this->_filesystems();
         }
     }
 }

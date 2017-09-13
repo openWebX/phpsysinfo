@@ -35,7 +35,8 @@ var mdstatus_show = false;
  * @param {number} id id of the device
  */
 function mdstatus_buildinfos(xml, id) {
-    var html = "", devstatus = "", devlevel = "", devchunk = 0, devsuper = 0, devalgo = 0, devactive = 0, devregis = 0, button = "";
+    var html = "", devstatus = "", devlevel = "", devchunk = 0, devsuper = 0, devalgo = 0, devactive = 0, devregis = 0,
+        button = "";
 
     devstatus = $(xml).attr("Disk_Status");
     devlevel = $(xml).attr("Level");
@@ -102,27 +103,27 @@ function mdstatus_diskicon(xml) {
         diskstatus = $(this).attr("Status");
         diskname = $(this).attr("Name");
         switch (diskstatus) {
-        case "ok":
-            img = "harddriveok.png";
-            alt = "ok";
-            break;
-        case "F":
-            img = "harddrivefail.png";
-            alt = "fail";
-            break;
-        case "S":
-            img = "harddrivespare.png";
-            alt = "spare";
-            break;
-        case "W":
-            img = "harddrivewarn.png";
-            alt = "spare";
-            break;
-        default:
+            case "ok":
+                img = "harddriveok.png";
+                alt = "ok";
+                break;
+            case "F":
+                img = "harddrivefail.png";
+                alt = "fail";
+                break;
+            case "S":
+                img = "harddrivespare.png";
+                alt = "spare";
+                break;
+            case "W":
+                img = "harddrivewarn.png";
+                alt = "spare";
+                break;
+            default:
 //            alert("--" + diskstatus + "--");
-            img = "error.png";
-            alt = "error";
-            break;
+                img = "error.png";
+                alt = "error";
+                break;
         }
         html += "<img class=\"plugin_mdstatus_biun\" src=\"./plugins/mdstatus/gfx/" + img + "\" alt=\"" + alt + "\" title=\"\" style=\"width:60px;height:60px\" onload=\"PNGload($(this));\" />"; //onload IE6 PNG fix
         html += "<small>" + diskname + "</small>";

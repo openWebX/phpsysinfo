@@ -13,7 +13,8 @@
  * @version   SVN: $Id: class.nut.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting ups information from upsc program
  *
  * @category  PHP
@@ -25,34 +26,32 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Nut extends UPS
-{
+class Nut extends UPS {
     /**
      * internal storage for all gathered data
      *
      * @var array
      */
-    private $_output = array();
-
+    private $_output = [];
+    
     /**
      * get all information from all configured ups and store output in internal array
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
         if (defined('PSI_UPS_NUT_LIST') && is_string(PSI_UPS_NUT_LIST)) {
             if (preg_match(ARRAY_EXP, PSI_UPS_NUT_LIST)) {
                 $upses = eval(PSI_UPS_NUT_LIST);
             } else {
-                $upses = array(PSI_UPS_NUT_LIST);
+                $upses = [PSI_UPS_NUT_LIST];
             }
             foreach ($upses as $ups) {
-                CommonFunctions::executeProgram('upsc', '-l '.trim($ups), $output, PSI_DEBUG);
+                CommonFunctions::executeProgram('upsc', '-l ' . trim($ups), $output, PSI_DEBUG);
                 $ups_names = preg_split("/\n/", $output, -1, PREG_SPLIT_NO_EMPTY);
                 foreach ($ups_names as $ups_name) {
-                    CommonFunctions::executeProgram('upsc', trim($ups_name).'@'.trim($ups), $temp, PSI_DEBUG);
-                    if (! empty($temp)) {
-                        $this->_output[trim($ups_name).'@'.trim($ups)] = $temp;
+                    CommonFunctions::executeProgram('upsc', trim($ups_name) . '@' . trim($ups), $temp, PSI_DEBUG);
+                    if (!empty($temp)) {
+                        $this->_output[trim($ups_name) . '@' . trim($ups)] = $temp;
                     }
                 }
             }
@@ -61,24 +60,34 @@ class Nut extends UPS
             $ups_names = preg_split("/\n/", $output, -1, PREG_SPLIT_NO_EMPTY);
             foreach ($ups_names as $ups_name) {
                 CommonFunctions::executeProgram('upsc', trim($ups_name), $temp, PSI_DEBUG);
-                if (! empty($temp)) {
+                if (!empty($temp)) {
                     $this->_output[trim($ups_name)] = $temp;
                 }
             }
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_UPS::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_info();
+    }
+    
     /**
      * parse the input and store data in resultset for xml generation
      *
      * @return void
      */
-    private function _info()
-    {
-        if (! empty($this->_output)) {
+    private function _info () {
+        if (!empty($this->_output)) {
             foreach ($this->_output as $name => $value) {
                 $temp = preg_split("/\n/", $value, -1, PREG_SPLIT_NO_EMPTY);
-                $ups_data = array();
+                $ups_data = [];
                 foreach ($temp as $valueTemp) {
                     $line = preg_split('/: /', $valueTemp, 2);
                     $ups_data[$line[0]] = isset($line[1]) ? trim($line[1]) : '';
@@ -95,7 +104,7 @@ class Nut extends UPS
                 if (isset($ups_data['ups.status'])) {
                     $dev->setStatus($ups_data['ups.status']);
                 }
-
+                
                 //Line
                 if (isset($ups_data['input.voltage'])) {
                     $dev->setLineVoltage($ups_data['input.voltage']);
@@ -106,7 +115,7 @@ class Nut extends UPS
                 if (isset($ups_data['ups.load'])) {
                     $dev->setLoad($ups_data['ups.load']);
                 }
-
+                
                 //Battery
                 if (isset($ups_data['battery.voltage'])) {
                     $dev->setBatteryVoltage($ups_data['battery.voltage']);
@@ -115,28 +124,16 @@ class Nut extends UPS
                     $dev->setBatterCharge($ups_data['battery.charge']);
                 }
                 if (isset($ups_data['battery.runtime'])) {
-                    $dev->setTimeLeft(round($ups_data['battery.runtime']/60, 2));
+                    $dev->setTimeLeft(round($ups_data['battery.runtime'] / 60, 2));
                 }
-
+                
                 //Temperature
                 if (isset($ups_data['ups.temperature'])) {
                     $dev->setTemperatur($ups_data['ups.temperature']);
                 }
-
+                
                 $this->upsinfo->setUpsDevices($dev);
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_UPS::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_info();
     }
 }

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * pitemp sensor class
  *
@@ -11,10 +12,14 @@
  * @copyright 2012 Marc Hillesheim
  * @link      http://pi.no-ip.biz
  */
-class PiTemp extends Sensors
-{
-    private function _temperature()
-    {
+class PiTemp extends Sensors {
+    public function build () {
+        $this->_temperature();
+        $this->_voltage();
+        $this->_current();
+    }
+    
+    private function _temperature () {
         $temp = null;
         $temp_max = null;
         if (!CommonFunctions::rfts('/sys/devices/platform/sunxi-i2c.0/i2c-0/0-0034/temp1_input', $temp, 1, 4096, false)) { // Not Banana Pi
@@ -31,9 +36,8 @@ class PiTemp extends Sensors
             $this->mbinfo->setMbTemp($dev);
         }
     }
-
-    private function _voltage()
-    {
+    
+    private function _voltage () {
         $volt = null;
         if (CommonFunctions::rfts('/sys/devices/platform/sunxi-i2c.0/i2c-0/0-0034/axp20-supplyer.28/power_supply/ac/voltage_now', $volt, 1, 4096, false) && !is_null($volt) && (($volt = trim($volt)) != "")) { // Banana Pi
             $dev = new SensorDevice();
@@ -42,9 +46,8 @@ class PiTemp extends Sensors
             $this->mbinfo->setMbVolt($dev);
         }
     }
-
-    private function _current()
-    {
+    
+    private function _current () {
         $current = null;
         if (CommonFunctions::rfts('/sys/devices/platform/sunxi-i2c.0/i2c-0/0-0034/axp20-supplyer.28/power_supply/ac/current_now', $current, 1, 4096, false) && !is_null($current) && (($current = trim($current)) != "")) { // Banana Pi
             $dev = new SensorDevice();
@@ -52,12 +55,5 @@ class PiTemp extends Sensors
             $dev->setValue($current / 1000000);
             $this->mbinfo->setMbCurrent($dev);
         }
-    }
-
-    public function build()
-    {
-        $this->_temperature();
-        $this->_voltage();
-        $this->_current();
     }
 }

@@ -20,13 +20,13 @@ function renderPlugin_quotas(data) {
         BytePercentUsed: {
             html: function () {
                 return '<div class="progress"><div class="progress-bar progress-bar-info" style="width:' + this["BytePercentUsed"] + '%;"></div>' +
-                        '</div><div class="percent">' + this["BytePercentUsed"] + '%</div>';
+                    '</div><div class="percent">' + this["BytePercentUsed"] + '%</div>';
             }
         },
         FilePercentUsed: {
             html: function () {
                 return '<div class="progress"><div class="progress-bar progress-bar-info" style="width:' + this["FilePercentUsed"] + '%;"></div>' +
-                        '</div><div class="percent">' + this["FilePercentUsed"] + '%</div>';
+                    '</div><div class="percent">' + this["FilePercentUsed"] + '%</div>';
             }
         }
     };

@@ -35,10 +35,10 @@ var iptables_show = false;
 function iptables_populate(xml) {
 
     var html = "";
- 
+
     $("Plugins Plugin_iptables iptables Item", xml).each(function iptables_getitem(idp) {
         html += "    <tr>\n";
-        html += "      <td style=\"font-weight:normal\">" +  $(this).attr("Rule") + "</td>\n";
+        html += "      <td style=\"font-weight:normal\">" + $(this).attr("Rule") + "</td>\n";
         html += "    </tr>\n";
         iptables_show = true;
     });

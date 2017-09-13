@@ -19,9 +19,9 @@
  */
 define('APP_ROOT', dirname(__FILE__));
 
-require_once APP_ROOT.'/includes/autoloader.inc.php';
+require_once APP_ROOT . '/includes/autoloader.inc.php';
 
-require_once APP_ROOT.'/read_config.php';
+require_once APP_ROOT . '/read_config.php';
 
 $file = isset($_GET['name']) ? basename(htmlspecialchars($_GET['name'])) : null;
 $plugin = isset($_GET['plugin']) ? basename(htmlspecialchars($_GET['plugin'])) : null;
@@ -29,25 +29,25 @@ $script = null;
 
 if ($file != null && $plugin == null) {
     if (strtolower(substr($file, 0, 6)) == 'jquery') {
-        $script = APP_ROOT.'/js/jQuery/'.$file;
+        $script = APP_ROOT . '/js/jQuery/' . $file;
     } elseif (strtolower(substr($file, 0, 10)) == 'phpsysinfo') {
-        $script = APP_ROOT.'/js/phpSysInfo/'.$file;
+        $script = APP_ROOT . '/js/phpSysInfo/' . $file;
     } else {
-        $script = APP_ROOT.'/js/vendor/'.$file;
+        $script = APP_ROOT . '/js/vendor/' . $file;
     }
 } elseif ($file == null && $plugin != null) {
-    $script = APP_ROOT.'/plugins/'.strtolower($plugin).'/js/'.strtolower($plugin);
+    $script = APP_ROOT . '/plugins/' . strtolower($plugin) . '/js/' . strtolower($plugin);
 } elseif ($file != null && $plugin != null) {
-    $script = APP_ROOT.'/plugins/'.strtolower($plugin).'/js/'.strtolower($file);
+    $script = APP_ROOT . '/plugins/' . strtolower($plugin) . '/js/' . strtolower($file);
 }
 
 if ($script != null) {
-    $scriptjs = $script.'.js';
-    $scriptmin = $script.'.min.js';
+    $scriptjs = $script . '.js';
+    $scriptmin = $script . '.min.js';
     $compression = false;
-
+    
     header("content-type: application/x-javascript");
-
+    
     if ((!defined("PSI_DEBUG") || (PSI_DEBUG !== true)) && defined("PSI_JS_COMPRESSION")) {
         $compression = strtolower(PSI_JS_COMPRESSION);
     }
@@ -78,7 +78,7 @@ if ($script != null) {
             } elseif (file_exists($scriptmin) && is_readable($scriptmin)) {
                 $filecontent = file_get_contents($scriptmin);
             } else break;
-
+            
             echo $filecontent;
             break;
     }

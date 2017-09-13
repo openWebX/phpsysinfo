@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.coretemp.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting hardware temperature information through sysctl
  *
  * @category  PHP
@@ -24,26 +25,35 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Coretemp extends Sensors
-{
+class Coretemp extends Sensors {
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_Sensor::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_temperature();
+    }
+    
     /**
      * get temperature information
      *
      * @return void
      */
-    private function _temperature()
-    {
+    private function _temperature () {
         if (PSI_OS == 'Linux') {
-           $hwpaths = glob("/sys/devices/platform/coretemp.*/", GLOB_NOSORT);
-           if (($totalh = count($hwpaths)) > 0) {
-               $buf = "";
-               for ($h = 0; $h < $totalh; $h++) {
-                   $tempsensor = glob($hwpaths[$h]."temp*_input", GLOB_NOSORT);
-                   if (($total = count($tempsensor)) > 0) {
+            $hwpaths = glob("/sys/devices/platform/coretemp.*/", GLOB_NOSORT);
+            if (($totalh = count($hwpaths)) > 0) {
+                $buf = "";
+                for ($h = 0; $h < $totalh; $h++) {
+                    $tempsensor = glob($hwpaths[$h] . "temp*_input", GLOB_NOSORT);
+                    if (($total = count($tempsensor)) > 0) {
                         $buf = "";
                         for ($i = 0; $i < $total; $i++) if (CommonFunctions::rfts($tempsensor[$i], $buf, 1, 4096, false) && (($buf = trim($buf)) != "")) {
                             $dev = new SensorDevice();
-                            $dev->setValue($buf/1000);
+                            $dev->setValue($buf / 1000);
                             $label = preg_replace("/_input$/", "_label", $tempsensor[$i]);
                             $crit = preg_replace("/_input$/", "_crit", $tempsensor[$i]);
                             $max = preg_replace("/_input$/", "_max", $tempsensor[$i]);
@@ -59,12 +69,12 @@ class Coretemp extends Sensors
                                 }
                             }
                             if (CommonFunctions::fileexists($crit) && CommonFunctions::rfts($crit, $buf, 1, 4096, false) && (($buf = trim($buf)) != "")) {
-                                $dev->setMax($buf/1000);
+                                $dev->setMax($buf / 1000);
                                 if (CommonFunctions::fileexists($crit_alarm) && CommonFunctions::rfts($crit_alarm, $buf, 1, 4096, false) && (trim($buf) === "1")) {
                                     $dev->setEvent("Critical Alarm");
                                 }
                             } elseif (CommonFunctions::fileexists($max) && CommonFunctions::rfts($max, $buf, 1, 4096, false) && (($buf = trim($buf)) != "")) {
-                                $dev->setMax($buf/1000);
+                                $dev->setMax($buf / 1000);
                             }
                             $this->mbinfo->setMbTemp($dev);
                         }
@@ -76,27 +86,15 @@ class Coretemp extends Sensors
             CommonFunctions::executeProgram('sysctl', '-n kern.smp.cpus', $smp);
             for ($i = 0; $i < $smp; $i++) {
                 $temp = 0;
-                if (CommonFunctions::executeProgram('sysctl', '-n dev.cpu.'.$i.'.temperature', $temp)) {
+                if (CommonFunctions::executeProgram('sysctl', '-n dev.cpu.' . $i . '.temperature', $temp)) {
                     $temp = preg_replace('/C/', '', $temp);
                     $dev = new SensorDevice();
-                    $dev->setName("CPU ".($i + 1));
+                    $dev->setName("CPU " . ($i + 1));
                     $dev->setValue($temp);
 //                    $dev->setMax(70);
                     $this->mbinfo->setMbTemp($dev);
                 }
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_Sensor::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_temperature();
     }
 }

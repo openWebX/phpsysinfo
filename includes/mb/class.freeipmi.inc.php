@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.freeipmi.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting information from ipmi-sensors
  *
  * @category  PHP
@@ -23,44 +24,57 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class FreeIPMI extends Sensors
-{
+class FreeIPMI extends Sensors {
     /**
      * content to parse
      *
      * @var array
      */
-    private $_lines = array();
-
+    private $_lines = [];
+    
     /**
      * fill the private content var through command or data access
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
-        switch (defined('PSI_SENSOR_FREEIPMI_ACCESS')?strtolower(PSI_SENSOR_FREEIPMI_ACCESS):'command') {
-        case 'command':
-            CommonFunctions::executeProgram('ipmi-sensors', '--output-sensor-thresholds', $lines);
-            $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
-            break;
-        case 'data':
-            if (CommonFunctions::rfts(APP_ROOT.'/data/freeipmi.txt', $lines)) {
+        switch (defined('PSI_SENSOR_FREEIPMI_ACCESS') ? strtolower(PSI_SENSOR_FREEIPMI_ACCESS) : 'command') {
+            case 'command':
+                CommonFunctions::executeProgram('ipmi-sensors', '--output-sensor-thresholds', $lines);
                 $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
-            }
-            break;
-        default:
-            $this->error->addConfigError('__construct()', 'PSI_SENSOR_FREEIPMI_ACCESS');
-            break;
+                break;
+            case 'data':
+                if (CommonFunctions::rfts(APP_ROOT . '/data/freeipmi.txt', $lines)) {
+                    $this->_lines = preg_split("/\n/", $lines, -1, PREG_SPLIT_NO_EMPTY);
+                }
+                break;
+            default:
+                $this->error->addConfigError('__construct()', 'PSI_SENSOR_FREEIPMI_ACCESS');
+                break;
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_Sensor::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_temperature();
+        $this->_voltage();
+        $this->_fans();
+        $this->_power();
+        $this->_current();
+        $this->_other();
+    }
+    
     /**
      * get temperature information
      *
      * @return void
      */
-    private function _temperature()
-    {
+    private function _temperature () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
             if ($buffer[2] == "Temperature" && $buffer[11] != "N/A" && $buffer[4] == "C") {
@@ -73,14 +87,13 @@ class FreeIPMI extends Sensors
             }
         }
     }
-
+    
     /**
      * get voltage information
      *
      * @return void
      */
-    private function _voltage()
-    {
+    private function _voltage () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
             if ($buffer[2] == "Voltage" && $buffer[11] != "N/A" && $buffer[4] == "V") {
@@ -94,14 +107,13 @@ class FreeIPMI extends Sensors
             }
         }
     }
-
+    
     /**
      * get fan information
      *
      * @return void
      */
-    private function _fans()
-    {
+    private function _fans () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
             if ($buffer[2] == "Fan" && $buffer[11] != "N/A" && $buffer[4] == "RPM") {
@@ -110,7 +122,7 @@ class FreeIPMI extends Sensors
                 $dev->setValue($buffer[3]);
                 if ($buffer[6] != "N/A") {
                     $dev->setMin($buffer[6]);
-                } elseif (($buffer[9] != "N/A") && ($buffer[9]<$buffer[3])) { //max instead min issue
+                } elseif (($buffer[9] != "N/A") && ($buffer[9] < $buffer[3])) { //max instead min issue
                     $dev->setMin($buffer[9]);
                 }
                 if ($buffer[11] != "'OK'") $dev->setEvent(trim($buffer[11], "'"));
@@ -118,14 +130,13 @@ class FreeIPMI extends Sensors
             }
         }
     }
-
+    
     /**
      * get power information
      *
      * @return void
      */
-    private function _power()
-    {
+    private function _power () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
             if ($buffer[2] == "Current" && $buffer[11] != "N/A" && $buffer[4] == "W") {
@@ -138,14 +149,13 @@ class FreeIPMI extends Sensors
             }
         }
     }
-
+    
     /**
      * get current information
      *
      * @return void
      */
-    private function _current()
-    {
+    private function _current () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
             if ($buffer[2] == "Current" && $buffer[11] != "N/A" && $buffer[4] == "A") {
@@ -159,40 +169,22 @@ class FreeIPMI extends Sensors
             }
         }
     }
-
+    
     /**
      * get other information
      *
      * @return void
      */
-    private function _other()
-    {
+    private function _other () {
         foreach ($this->_lines as $line) {
             $buffer = preg_split("/\s*\|\s*/", $line);
-             if ($buffer[4] == "N/A"
+            if ($buffer[4] == "N/A"
                 && $buffer[11] != "N/A") {
                 $dev = new SensorDevice();
-                $dev->setName($buffer[1].' ('.$buffer[2].')');
+                $dev->setName($buffer[1] . ' (' . $buffer[2] . ')');
                 $dev->setValue(trim($buffer[11], '\''));
                 $this->mbinfo->setMbOther($dev);
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_Sensor::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_temperature();
-        $this->_voltage();
-        $this->_fans();
-        $this->_power();
-        $this->_current();
-        $this->_other();
     }
 }

@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.apcupsd.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting ups information from apcupsd program
  *
  * @category  PHP
@@ -24,52 +25,60 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Apcupsd extends UPS
-{
+class Apcupsd extends UPS {
     /**
      * internal storage for all gathered data
      *
      * @var array
      */
-    private $_output = array();
-
+    private $_output = [];
+    
     /**
      * get all information from all configured ups in phpsysinfo.ini and store output in internal array
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
         if (defined('PSI_UPS_APCUPSD_LIST') && is_string(PSI_UPS_APCUPSD_LIST)) {
             if (preg_match(ARRAY_EXP, PSI_UPS_APCUPSD_LIST)) {
                 $upses = eval(PSI_UPS_APCUPSD_LIST);
             } else {
-                $upses = array(PSI_UPS_APCUPSD_LIST);
+                $upses = [PSI_UPS_APCUPSD_LIST];
             }
             foreach ($upses as $ups) {
-                CommonFunctions::executeProgram('apcaccess', 'status '.trim($ups), $temp);
-                if (! empty($temp)) {
+                CommonFunctions::executeProgram('apcaccess', 'status ' . trim($ups), $temp);
+                if (!empty($temp)) {
                     $this->_output[] = $temp;
                 }
             }
         } else { //use default if address and port not defined
             CommonFunctions::executeProgram('apcaccess', 'status', $temp);
-            if (! empty($temp)) {
+            if (!empty($temp)) {
                 $this->_output[] = $temp;
             }
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_UPS::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_info();
+    }
+    
     /**
      * parse the input and store data in resultset for xml generation
      *
      * @return Void
      */
-    private function _info()
-    {
+    private function _info () {
         foreach ($this->_output as $ups) {
-
+            
             $dev = new UPSDevice();
-
+            
             // General info
             if (preg_match('/^UPSNAME\s*:\s*(.*)$/m', $ups, $data)) {
                 $dev->setName(trim($data[1]));
@@ -77,7 +86,7 @@ class Apcupsd extends UPS
             if (preg_match('/^MODEL\s*:\s*(.*)$/m', $ups, $data)) {
                 $model = trim($data[1]);
                 if (preg_match('/^APCMODEL\s*:\s*(.*)$/m', $ups, $data)) {
-                    $dev->setModel($model.' ('.trim($data[1]).')');
+                    $dev->setModel($model . ' (' . trim($data[1]) . ')');
                 } else {
                     $dev->setModel($model);
                 }
@@ -132,17 +141,5 @@ class Apcupsd extends UPS
             }
             $this->upsinfo->setUpsDevices($dev);
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_UPS::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_info();
     }
 }

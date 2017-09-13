@@ -12,7 +12,8 @@
  * @version   SVN: $Id: class.nut.inc.php 661 2012-08-27 11:26:39Z namiltd $
  * @link      http://phpsysinfo.sourceforge.net
  */
- /**
+
+/**
  * getting ups information from pmset program
  *
  * @category  PHP
@@ -23,41 +24,49 @@
  * @version   Release: 3.0
  * @link      http://phpsysinfo.sourceforge.net
  */
-class Pmset extends UPS
-{
+class Pmset extends UPS {
     /**
      * internal storage for all gathered data
      *
      * @var array
      */
-    private $_output = array();
-
+    private $_output = [];
+    
     /**
      * get all information from all configured ups and store output in internal array
      */
-    public function __construct()
-    {
+    public function __construct () {
         parent::__construct();
         $temp = "";
         if (CommonFunctions::executeProgram('pmset', '-g batt', $temp) && !empty($temp)) {
             $this->_output[] = $temp;
         }
     }
-
+    
+    /**
+     * get the information
+     *
+     * @see PSI_Interface_UPS::build()
+     *
+     * @return Void
+     */
+    public function build () {
+        $this->_info();
+    }
+    
     /**
      * parse the input and store data in resultset for xml generation
      *
      * @return void
      */
-   private function _info()
-    {
+    private function _info () {
         if (empty($this->_output)) {
             return;
         }
-        $model = array();
-        $percCharge = array();
+        $model = [];
+        $percCharge = [];
         $lines = explode(PHP_EOL, implode($this->_output));
-        if (count($lines)>1) {
+        if (count($lines) > 1) {
             $model = explode('FW:', $lines[1]);
             if (strpos($model[0], 'InternalBattery') === false) {
                 $dev = new UPSDevice();
@@ -72,7 +81,7 @@ class Pmset extends UPS
                     if (isset($percCharge[2])) {
                         $time = explode(':', $percCharge[2]);
                         $hours = $time[0];
-                        $minutes = $hours*60+substr($time[1], 0, 2);
+                        $minutes = $hours * 60 + substr($time[1], 0, 2);
                         $dev->setTimeLeft($minutes);
                     }
                 }
@@ -80,17 +89,5 @@ class Pmset extends UPS
                 $this->upsinfo->setUpsDevices($dev);
             }
         }
-    }
-
-    /**
-     * get the information
-     *
-     * @see PSI_Interface_UPS::build()
-     *
-     * @return Void
-     */
-    public function build()
-    {
-        $this->_info();
     }
 }

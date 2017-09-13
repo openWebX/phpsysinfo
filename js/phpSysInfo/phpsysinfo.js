@@ -26,13 +26,14 @@
 "use strict";
 
 var langxml = [], langcounter = 1, filesystemTable, current_language = "", plugin_liste = [], blocks = [], langarr = [],
-     showCPUListExpanded, showCPUInfoExpanded, showNetworkInfosExpanded, showMemoryInfosExpanded, showNetworkActiveSpeed, showCPULoadCompact, oldnetwork = [];
+    showCPUListExpanded, showCPUInfoExpanded, showNetworkInfosExpanded, showMemoryInfosExpanded, showNetworkActiveSpeed,
+    showCPULoadCompact, oldnetwork = [];
 
 /**
  * Fix PNG loading on IE6 or below
  */
 function PNGload(png) {
-    if (typeof(png.ifixpng)==='function') { //IE6 PNG fix
+    if (typeof(png.ifixpng) === 'function') { //IE6 PNG fix
         png.ifixpng('./gfx/blank.gif');
     }
 }
@@ -48,7 +49,7 @@ function createCookie(name, value, days) {
     var date = new Date(), expires = "";
     if (days) {
         date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-        if (typeof(date.toUTCString)==="function") {
+        if (typeof(date.toUTCString) === "function") {
             expires = "; expires=" + date.toUTCString();
         } else {
             //deprecated
@@ -203,7 +204,7 @@ function genlang(id, generate, plugin) {
     if ((langxml[langarrId] !== undefined)
         && (langarr[langarrId] !== undefined)) {
         html += langarr[langarrId][idString];
-    }    
+    }
 
     html += "</span>";
 
@@ -258,7 +259,7 @@ function changeSpanLanguage(plugin) {
         });
     } else {
         langarrId += plugin;
-        $('span[id*=lang_plugin_'+plugin.toLowerCase()+'_]').each(function translate(i) {
+        $('span[id*=lang_plugin_' + plugin.toLowerCase() + '_]').each(function translate(i) {
             langId = this.getAttribute('id').substring(5);
             if (langId.indexOf('-') !== -1) {
                 langId = langId.substring(0, langId.indexOf('-')); //remove the unique identifier
@@ -270,7 +271,7 @@ function changeSpanLanguage(plugin) {
                 }
             }
         });
-        $('#panel_'+plugin).show(); //show plugin if any language loaded
+        $('#panel_' + plugin).show(); //show plugin if any language loaded
     }
 }
 
@@ -428,107 +429,107 @@ function formatBytes(bytes, xml) {
     });
 
     switch (byteFormat.toLowerCase()) {
-    case "pib":
-        show += round(bytes / Math.pow(1024, 5), 2);
-        show += "&nbsp;" + genlang(90, true);
-        break;
-    case "tib":
-        show += round(bytes / Math.pow(1024, 4), 2);
-        show += "&nbsp;" + genlang(86, true);
-        break;
-    case "gib":
-        show += round(bytes / Math.pow(1024, 3), 2);
-        show += "&nbsp;" + genlang(87, true);
-        break;
-    case "mib":
-        show += round(bytes / Math.pow(1024, 2), 2);
-        show += "&nbsp;" + genlang(88, true);
-        break;
-    case "kib":
-        show += round(bytes / Math.pow(1024, 1), 2);
-        show += "&nbsp;" + genlang(89, true);
-        break;
-    case "pb":
-        show += round(bytes / Math.pow(1000, 5), 2);
-        show += "&nbsp;" + genlang(91, true);
-        break;
-    case "tb":
-        show += round(bytes / Math.pow(1000, 4), 2);
-        show += "&nbsp;" + genlang(85, true);
-        break;
-    case "gb":
-        show += round(bytes / Math.pow(1000, 3), 2);
-        show += "&nbsp;" + genlang(41, true);
-        break;
-    case "mb":
-        show += round(bytes / Math.pow(1000, 2), 2);
-        show += "&nbsp;" + genlang(40, true);
-        break;
-    case "kb":
-        show += round(bytes / Math.pow(1000, 1), 2);
-        show += "&nbsp;" + genlang(39, true);
-        break;
-    case "b":
-        show += bytes;
-        show += "&nbsp;" + genlang(96, true);
-        break;
-    case "auto_decimal":
-        if (bytes > Math.pow(1000, 5)) {
-            show += round(bytes / Math.pow(1000, 5), 2);
-            show += "&nbsp;" + genlang(91, true);
-        } else {
-            if (bytes > Math.pow(1000, 4)) {
-                show += round(bytes / Math.pow(1000, 4), 2);
-                show += "&nbsp;" + genlang(85, true);
-            } else {
-                if (bytes > Math.pow(1000, 3)) {
-                    show += round(bytes / Math.pow(1000, 3), 2);
-                    show += "&nbsp;" + genlang(41, true);
-                } else {
-                    if (bytes > Math.pow(1000, 2)) {
-                        show += round(bytes / Math.pow(1000, 2), 2);
-                        show += "&nbsp;" + genlang(40, true);
-                    } else {
-                        if (bytes > Math.pow(1000, 1)) {
-                            show += round(bytes / Math.pow(1000, 1), 2);
-                            show += "&nbsp;" + genlang(39, true);
-                        } else {
-                                show += bytes;
-                                show += "&nbsp;" + genlang(96, true);
-                        }
-                    }
-                }
-            }
-        }
-        break;
-    default:
-        if (bytes > Math.pow(1024, 5)) {
+        case "pib":
             show += round(bytes / Math.pow(1024, 5), 2);
             show += "&nbsp;" + genlang(90, true);
-        } else {
-            if (bytes > Math.pow(1024, 4)) {
-                show += round(bytes / Math.pow(1024, 4), 2);
-                show += "&nbsp;" + genlang(86, true);
+            break;
+        case "tib":
+            show += round(bytes / Math.pow(1024, 4), 2);
+            show += "&nbsp;" + genlang(86, true);
+            break;
+        case "gib":
+            show += round(bytes / Math.pow(1024, 3), 2);
+            show += "&nbsp;" + genlang(87, true);
+            break;
+        case "mib":
+            show += round(bytes / Math.pow(1024, 2), 2);
+            show += "&nbsp;" + genlang(88, true);
+            break;
+        case "kib":
+            show += round(bytes / Math.pow(1024, 1), 2);
+            show += "&nbsp;" + genlang(89, true);
+            break;
+        case "pb":
+            show += round(bytes / Math.pow(1000, 5), 2);
+            show += "&nbsp;" + genlang(91, true);
+            break;
+        case "tb":
+            show += round(bytes / Math.pow(1000, 4), 2);
+            show += "&nbsp;" + genlang(85, true);
+            break;
+        case "gb":
+            show += round(bytes / Math.pow(1000, 3), 2);
+            show += "&nbsp;" + genlang(41, true);
+            break;
+        case "mb":
+            show += round(bytes / Math.pow(1000, 2), 2);
+            show += "&nbsp;" + genlang(40, true);
+            break;
+        case "kb":
+            show += round(bytes / Math.pow(1000, 1), 2);
+            show += "&nbsp;" + genlang(39, true);
+            break;
+        case "b":
+            show += bytes;
+            show += "&nbsp;" + genlang(96, true);
+            break;
+        case "auto_decimal":
+            if (bytes > Math.pow(1000, 5)) {
+                show += round(bytes / Math.pow(1000, 5), 2);
+                show += "&nbsp;" + genlang(91, true);
             } else {
-                if (bytes > Math.pow(1024, 3)) {
-                    show += round(bytes / Math.pow(1024, 3), 2);
-                    show += "&nbsp;" + genlang(87, true);
+                if (bytes > Math.pow(1000, 4)) {
+                    show += round(bytes / Math.pow(1000, 4), 2);
+                    show += "&nbsp;" + genlang(85, true);
                 } else {
-                    if (bytes > Math.pow(1024, 2)) {
-                        show += round(bytes / Math.pow(1024, 2), 2);
-                        show += "&nbsp;" + genlang(88, true);
+                    if (bytes > Math.pow(1000, 3)) {
+                        show += round(bytes / Math.pow(1000, 3), 2);
+                        show += "&nbsp;" + genlang(41, true);
                     } else {
-                        if (bytes > Math.pow(1024, 1)) {
-                            show += round(bytes / Math.pow(1024, 1), 2);
-                            show += "&nbsp;" + genlang(89, true);
+                        if (bytes > Math.pow(1000, 2)) {
+                            show += round(bytes / Math.pow(1000, 2), 2);
+                            show += "&nbsp;" + genlang(40, true);
                         } else {
-                            show += bytes;
-                            show += "&nbsp;" + genlang(96, true);
+                            if (bytes > Math.pow(1000, 1)) {
+                                show += round(bytes / Math.pow(1000, 1), 2);
+                                show += "&nbsp;" + genlang(39, true);
+                            } else {
+                                show += bytes;
+                                show += "&nbsp;" + genlang(96, true);
+                            }
                         }
                     }
                 }
             }
-        }
+            break;
+        default:
+            if (bytes > Math.pow(1024, 5)) {
+                show += round(bytes / Math.pow(1024, 5), 2);
+                show += "&nbsp;" + genlang(90, true);
+            } else {
+                if (bytes > Math.pow(1024, 4)) {
+                    show += round(bytes / Math.pow(1024, 4), 2);
+                    show += "&nbsp;" + genlang(86, true);
+                } else {
+                    if (bytes > Math.pow(1024, 3)) {
+                        show += round(bytes / Math.pow(1024, 3), 2);
+                        show += "&nbsp;" + genlang(87, true);
+                    } else {
+                        if (bytes > Math.pow(1024, 2)) {
+                            show += round(bytes / Math.pow(1024, 2), 2);
+                            show += "&nbsp;" + genlang(88, true);
+                        } else {
+                            if (bytes > Math.pow(1024, 1)) {
+                                show += round(bytes / Math.pow(1024, 1), 2);
+                                show += "&nbsp;" + genlang(89, true);
+                            } else {
+                                show += bytes;
+                                show += "&nbsp;" + genlang(96, true);
+                            }
+                        }
+                    }
+                }
+            }
     }
     return show;
 }
@@ -556,8 +557,8 @@ function formatBPS(bps) {
                         show += round(bps / Math.pow(1000, 1), 2);
                         show += String.fromCharCode(160) + 'Kb/s';
                     } else {
-                            show += bps;
-                            show += String.fromCharCode(160) + 'b/s';
+                        show += bps;
+                        show += String.fromCharCode(160) + 'b/s';
                     }
                 }
             }
@@ -584,14 +585,14 @@ function formatTemp(degreeC, xml) {
         return "---";
     } else {
         switch (tempFormat) {
-        case "f":
-            return round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true);
-        case "c":
-            return round(degree, 1) + "&nbsp;" + genlang(60, true);
-        case "c-f":
-            return round(degree, 1) + "&nbsp;" + genlang(60, true) + "<br><i>(" + round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true) + ")</i>";
-        case "f-c":
-            return round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true) + "<br><i>(" + round(degree, 1) + "&nbsp;" + genlang(60, true) + ")</i>";
+            case "f":
+                return round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true);
+            case "c":
+                return round(degree, 1) + "&nbsp;" + genlang(60, true);
+            case "c-f":
+                return round(degree, 1) + "&nbsp;" + genlang(60, true) + "<br><i>(" + round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true) + ")</i>";
+            case "f-c":
+                return round((((9 * degree) / 5) + 32), 1) + "&nbsp;" + genlang(61, true) + "<br><i>(" + round(degree, 1) + "&nbsp;" + genlang(60, true) + ")</i>";
         }
     }
 }
@@ -630,7 +631,7 @@ function refreshVitals(xml) {
     var processes = 0, prunning = 0, psleeping = 0, pstopped = 0, pzombie = 0, pwaiting = 0, pother = 0;
     var syslang = "", codepage = "";
     var lastboot = 0;
-    var timestamp = parseInt($("Generation", xml).attr("timestamp"), 10)*1000; //server time
+    var timestamp = parseInt($("Generation", xml).attr("timestamp"), 10) * 1000; //server time
     var not_first = false;
     var datetimeFormat = "";
     if (isNaN(timestamp)) timestamp = Number(new Date()); //client time
@@ -646,7 +647,7 @@ function refreshVitals(xml) {
         distro = $(this).attr("Distro");
         icon = $(this).attr("Distroicon");
         uptime = formatUptime(parseInt($(this).attr("Uptime"), 10));
-        lastboot = new Date(timestamp - (parseInt($(this).attr("Uptime"), 10)*1000));
+        lastboot = new Date(timestamp - (parseInt($(this).attr("Uptime"), 10) * 1000));
         users = parseInt($(this).attr("Users"), 10);
         loadavg = $(this).attr("LoadAvg");
         if ($(this).attr("CPULoad") !== undefined) {
@@ -654,15 +655,15 @@ function refreshVitals(xml) {
         }
         if ($(this).attr("SysLang") !== undefined) {
             syslang = $(this).attr("SysLang");
-            document.getElementById("s_syslang_tr").style.display='';
+            document.getElementById("s_syslang_tr").style.display = '';
         }
 
         if ($(this).attr("CodePage") !== undefined) {
             codepage = $(this).attr("CodePage");
             if ($(this).attr("SysLang") !== undefined) {
-                document.getElementById("s_codepage_tr1").style.display='';
+                document.getElementById("s_codepage_tr1").style.display = '';
             } else {
-                document.getElementById("s_codepage_tr2").style.display='';
+                document.getElementById("s_codepage_tr2").style.display = '';
             }
         }
 
@@ -671,9 +672,9 @@ function refreshVitals(xml) {
             processes = parseInt($(this).attr("Processes"), 10);
             if ((($(this).attr("CodePage") !== undefined) && ($(this).attr("SysLang") == undefined)) ||
                 (($(this).attr("CodePage") == undefined) && ($(this).attr("SysLang") !== undefined))) {
-                document.getElementById("s_processes_tr1").style.display='';
+                document.getElementById("s_processes_tr1").style.display = '';
             } else {
-                document.getElementById("s_processes_tr2").style.display='';
+                document.getElementById("s_processes_tr2").style.display = '';
             }
         }
         if ($(this).attr("ProcessesRunning") !== undefined) {
@@ -706,7 +707,7 @@ function refreshVitals(xml) {
         if ((datetimeFormat !== undefined) && (datetimeFormat.toLowerCase() === "locale")) {
             $("#s_lastboot").html(lastboot.toLocaleString());
         } else {
-            if (typeof(lastboot.toUTCString)==="function") {
+            if (typeof(lastboot.toUTCString) === "function") {
                 $("#s_lastboot").html(lastboot.toUTCString());
             } else {
                 //deprecated
@@ -723,7 +724,7 @@ function refreshVitals(xml) {
         if (prunning || psleeping || pstopped || pzombie || pwaiting || pother) {
             $("#s_processes_1").append(" (");
             $("#s_processes_2").append(" (");
-            var typelist = {running:111,sleeping:112,stopped:113,zombie:114,waiting:115,other:116};
+            var typelist = {running: 111, sleeping: 112, stopped: 113, zombie: 114, waiting: 115, other: 116};
             for (var proc_type in typelist) {
                 if (eval("p" + proc_type)) {
                     if (not_first) {
@@ -752,7 +753,8 @@ function refreshVitals(xml) {
 function fillCpu(xml, tree, rootposition, collapsed) {
     var cpucount = 0, html = "";
     $("Hardware CPU CpuCore", xml).each(function getCpuCore(cpuCoreId) {
-        var model = "", speed = 0, bus = 0, cache = 0, bogo = 0, temp = 0, load = 0, speedmax = 0, speedmin = 0, cpucoreposition = 0, virt = "";
+        var model = "", speed = 0, bus = 0, cache = 0, bogo = 0, temp = 0, load = 0, speedmax = 0, speedmin = 0,
+            cpucoreposition = 0, virt = "";
         cpucount++;
         model = $(this).attr("Model");
         speed = parseInt($(this).attr("CpuSpeed"), 10);
@@ -894,7 +896,7 @@ function refreshHardware(xml) {
         html += fillCpu(xml, tree, tree.push(0), closed);
     }
 
-    var typelist = {PCI:17,IDE:18,SCSI:19,USB:20,TB:117,I2C:118};
+    var typelist = {PCI: 17, IDE: 18, SCSI: 19, USB: 20, TB: 117, I2C: 118};
     for (var dev_type in typelist) {
         if (countHWDevice(xml, dev_type)) {
             html += "    <tr><td colspan=\"2\"><span class=\"treespanbold\">" + genlang(typelist[dev_type], false) + "</span></td></tr>\n";
@@ -935,7 +937,7 @@ function refreshNetwork(xml) {
         return;
     }
 
-    var tree = [], closed = [], html0= "", html1= "" ,html = "", isinfo = false, preoldnetwork = [], timestamp;
+    var tree = [], closed = [], html0 = "", html1 = "", html = "", isinfo = false, preoldnetwork = [], timestamp;
 
     $("#network").empty();
 
@@ -968,35 +970,36 @@ function refreshNetwork(xml) {
             var diff, difftime;
             if (((diff = rx - oldnetwork[name]["rx"]) > 0) && ((difftime = timestamp - oldnetwork[name]["timestamp"]) > 0)) {
                 if (showNetworkActiveSpeed == 2) {
-                    htmlrx ="<br><i>("+formatBPS(round(8*diff/difftime, 2))+")</i>";
+                    htmlrx = "<br><i>(" + formatBPS(round(8 * diff / difftime, 2)) + ")</i>";
                 } else {
-                    htmlrx ="<br><i>("+formatBytes(round(diff/difftime, 2), xml)+"/s)</i>";
+                    htmlrx = "<br><i>(" + formatBytes(round(diff / difftime, 2), xml) + "/s)</i>";
                 }
             }
             if (((diff = tx - oldnetwork[name]["tx"]) > 0) && (difftime > 0)) {
                 if (showNetworkActiveSpeed == 2) {
-                    htmltx ="<br><i>("+formatBPS(round(8*diff/difftime, 2))+")</i>";
+                    htmltx = "<br><i>(" + formatBPS(round(8 * diff / difftime, 2)) + ")</i>";
                 } else {
-                    htmltx ="<br><i>("+formatBytes(round(diff/difftime, 2), xml)+"/s)</i>";
+                    htmltx = "<br><i>(" + formatBytes(round(diff / difftime, 2), xml) + "/s)</i>";
                 }
             }
         }
 
-        html +="<tr><td><span class=\"treespan\">" + name + "</span></td><td class=\"right\">" + formatBytes(rx, xml) + htmlrx + "</td><td class=\"right\">" + formatBytes(tx, xml) + htmltx +"</td><td class=\"right\">" + er.toString() + "/<wbr>" + dr.toString() + "</td></tr>";
+        html += "<tr><td><span class=\"treespan\">" + name + "</span></td><td class=\"right\">" + formatBytes(rx, xml) + htmlrx + "</td><td class=\"right\">" + formatBytes(tx, xml) + htmltx + "</td><td class=\"right\">" + er.toString() + "/<wbr>" + dr.toString() + "</td></tr>";
 
         networkindex = tree.push(0);
 
         if (showNetworkActiveSpeed) {
             preoldnetwork.pushIfNotExist(name);
-            preoldnetwork[name] = {timestamp:timestamp, rx:rx, tx:tx};
+            preoldnetwork[name] = {timestamp: timestamp, rx: rx, tx: tx};
         }
 
         info = $(this).attr("Info");
-        if ( (info !== undefined) && (info != "") ) {
-            var i = 0, infos = info.replace(/:/g, "<wbr>:").split(";"); /* split long addresses */
+        if ((info !== undefined) && (info != "")) {
+            var i = 0, infos = info.replace(/:/g, "<wbr>:").split(";");
+            /* split long addresses */
             isinfo = true;
-            for(i = 0; i < infos.length; i++){
-                html +="<tr><td><span class=\"treespan\">" + infos[i] + "</span></td><td></td><td></td><td></td></tr>";
+            for (i = 0; i < infos.length; i++) {
+                html += "<tr><td><span class=\"treespan\">" + infos[i] + "</span></td><td></td><td></td><td></td></tr>";
                 tree.push(networkindex);
             }
             if (!showNetworkInfosExpanded) {
@@ -1007,13 +1010,13 @@ function refreshNetwork(xml) {
     html += "</tbody>\n";
     html += "</table>\n";
     if (isinfo) {
-       html0 += "<table id=\"NetworkTree\" class=\"tablemain\" style=\"border-spacing:0;\">\n";
-       html1 += "   <tbody class=\"tree\">\n";
+        html0 += "<table id=\"NetworkTree\" class=\"tablemain\" style=\"border-spacing:0;\">\n";
+        html1 += "   <tbody class=\"tree\">\n";
     } else {
-       html0 += "<table id=\"NetworkTree\" class=\"stripeMe\" style=\"border-spacing:0;\">\n";
-       html1 += "   <tbody class=\"tbody_network\">\n";
+        html0 += "<table id=\"NetworkTree\" class=\"stripeMe\" style=\"border-spacing:0;\">\n";
+        html1 += "   <tbody class=\"tbody_network\">\n";
     }
-    $("#network").append(html0+html1+html);
+    $("#network").append(html0 + html1 + html);
 
     if (isinfo) $("#NetworkTree").jqTreeTable(tree, {
         openImg: "./gfx/treeTable/tv-collapsable.gif",
@@ -1029,11 +1032,11 @@ function refreshNetwork(xml) {
         striped: true,
         highlight: false,
         state: false
-      });
+    });
 
     if (showNetworkActiveSpeed) {
         while (oldnetwork.length > 0) {
-            delete oldnetwork[oldnetwork.length-1]; //remove last object
+            delete oldnetwork[oldnetwork.length - 1]; //remove last object
             oldnetwork.pop(); //remove last object reference from array
         }
         oldnetwork = preoldnetwork;
@@ -1114,7 +1117,7 @@ function refreshMemory(xml) {
         $("Memory Swap Mount", xml).each(function getDevices(id) {
             var free = 0, total = 0, used = 0, percent = 0, mpoint = "", mpid = 0;
             if (!showMemoryInfosExpanded) {
-                    closed.push(swapindex);
+                closed.push(swapindex);
             }
             free = parseInt($(this).attr("Free"), 10);
             used = parseInt($(this).attr("Used"), 10);
@@ -1175,10 +1178,12 @@ function refreshFilesystems(xml) {
     });
 
     $("FileSystem Mount", xml).each(function getMount(mid) {
-        var mpoint = "", mpid = 0, type = "", name = "", free = 0, used = 0, size = 0, percent = 0, options = "", inodes = 0, inodes_text = "", options_text = "";
+        var mpoint = "", mpid = 0, type = "", name = "", free = 0, used = 0, size = 0, percent = 0, options = "",
+            inodes = 0, inodes_text = "", options_text = "";
         mpid = parseInt($(this).attr("MountPointID"), 10);
         type = $(this).attr("FSType");
-        name = $(this).attr("Name").replace(/;/g, ";<wbr>"); /* split long name */
+        name = $(this).attr("Name").replace(/;/g, ";<wbr>");
+        /* split long name */
         free = parseInt($(this).attr("Free"), 10);
         used = parseInt($(this).attr("Used"), 10);
         size = parseInt($(this).attr("Total"), 10);
@@ -1242,7 +1247,7 @@ function refreshTemp(xml) {
             _limit = formatTemp(limit, xml);
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
         $("#temperatureTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + formatTemp(value, xml) + "</td><td class=\"right\">" + _limit + "</td></tr>");
         values = true;
     });
@@ -1279,7 +1284,7 @@ function refreshVoltage(xml) {
             _min = round(min, 2) + "&nbsp;" + genlang(62, true);
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
         $("#voltageTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + round(value, 2) + "&nbsp;" + genlang(62, true) + "</td><td class=\"right\">" + _min + "</td><td class=\"right\">" + _max + "</td></tr>");
         values = true;
     });
@@ -1310,11 +1315,11 @@ function refreshFans(xml) {
         value = parseFloat($(this).attr("Value"));
         min = parseFloat($(this).attr("Min"));
         if (isFinite(min))
-            _min = round(min,0) + "&nbsp;" + genlang(63, true);
+            _min = round(min, 0) + "&nbsp;" + genlang(63, true);
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
-        $("#fansTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + round(value,0) + "&nbsp;" + genlang(63, true) + "</td><td class=\"right\">" + _min + "</td></tr>");
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
+        $("#fansTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + round(value, 0) + "&nbsp;" + genlang(63, true) + "</td><td class=\"right\">" + _min + "</td></tr>");
         values = true;
     });
     if (values) {
@@ -1347,7 +1352,7 @@ function refreshPower(xml) {
             _limit = round(limit, 2) + "&nbsp;" + genlang(103, true);
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
         $("#powerTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + round(value, 2) + "&nbsp;" + genlang(103, true) + "</td><td class=\"right\">" + _limit + "</td></tr>");
         values = true;
     });
@@ -1386,7 +1391,7 @@ function refreshCurrent(xml) {
 
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
         $("#currentTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + round(value, 2) + "&nbsp;" + genlang(106, true) + "</td><td class=\"right\">" + _min + "</td><td class=\"right\">" + _max + "</td></tr>");
         values = true;
     });
@@ -1418,7 +1423,7 @@ function refreshOther(xml) {
 
         event = $(this).attr("Event");
         if (event !== undefined)
-            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\""+event+"\"/>";
+            label += " <img style=\"vertical-align: middle; width:16px;\" src=\"./gfx/attention.gif\" alt=\"!\" title=\"" + event + "\"/>";
         $("#otherTable tbody").append("<tr><td>" + label + "</td><td class=\"right\">" + value + "</td></tr>");
         values = true;
     });
@@ -1449,7 +1454,9 @@ function refreshUps(xml) {
 
     $("#ups").empty();
     $("UPSInfo UPS", xml).each(function getUps(id) {
-        var name = "", model = "", mode = "", start_time = "", upsstatus = "", temperature = "", outages_count = "", last_outage = "", last_outage_finish = "", line_voltage = "", line_frequency = "", load_percent = "", battery_date = "", battery_voltage = "", battery_charge_percent = "", time_left_minutes = "";
+        var name = "", model = "", mode = "", start_time = "", upsstatus = "", temperature = "", outages_count = "",
+            last_outage = "", last_outage_finish = "", line_voltage = "", line_frequency = "", load_percent = "",
+            battery_date = "", battery_voltage = "", battery_charge_percent = "", time_left_minutes = "";
         name = $(this).attr("Name");
         model = $(this).attr("Model");
         mode = $(this).attr("Mode");
@@ -1530,11 +1537,11 @@ function refreshUps(xml) {
             html += "<tr><td style=\"width:160px\"><span class=\"treespan\">" + genlang(81, true) + "</span></td><td>" + time_left_minutes + "&nbsp;" + genlang(83, true) + "</td></tr>\n";
             tree.push(index);
         }
-        values=true;
+        values = true;
     });
     html += "          </tbody>\n";
     html += "        </table>\n";
-    if (add_apcupsd_cgi_links){
+    if (add_apcupsd_cgi_links) {
         html += " (<a title='details' href='/cgi-bin/apcupsd/multimon.cgi' target='apcupsdcgi'>" + genlang(99, false) + "</a>)\n";
     }
 
@@ -1635,29 +1642,32 @@ function settimer(xml) {
 $(document).ready(function buildpage() {
     var i = 0, cookie_template = null, cookie_language = null, blocktmp = "";
 
-    showCPUListExpanded = $("#showCPUListExpanded").val().toString()==="true";
-    showCPUInfoExpanded = $("#showCPUInfoExpanded").val().toString()==="true";
-    showNetworkInfosExpanded = $("#showNetworkInfosExpanded").val().toString()==="true";
-    showMemoryInfosExpanded = $("#showMemoryInfosExpanded").val().toString()==="true";
-    showCPULoadCompact = $("#showCPULoadCompact").val().toString()==="true";
+    showCPUListExpanded = $("#showCPUListExpanded").val().toString() === "true";
+    showCPUInfoExpanded = $("#showCPUInfoExpanded").val().toString() === "true";
+    showNetworkInfosExpanded = $("#showNetworkInfosExpanded").val().toString() === "true";
+    showMemoryInfosExpanded = $("#showMemoryInfosExpanded").val().toString() === "true";
+    showCPULoadCompact = $("#showCPULoadCompact").val().toString() === "true";
     switch ($("#showNetworkActiveSpeed").val().toString()) {
-        case "bps":  showNetworkActiveSpeed = 2;
-                      break;
-        case "true": showNetworkActiveSpeed = 1;
-                      break;
-        default:     showNetworkActiveSpeed = 0;
+        case "bps":
+            showNetworkActiveSpeed = 2;
+            break;
+        case "true":
+            showNetworkActiveSpeed = 1;
+            break;
+        default:
+            showNetworkActiveSpeed = 0;
     }
 
     blocktmp = $("#blocks").val().toString();
-    if (blocktmp.length >0 ){
+    if (blocktmp.length > 0) {
         if (blocktmp === "true") {
             blocks[0] = "true";
         } else {
             blocks = blocktmp.split(',');
             var j = 2;
             for (i = 0; i < blocks.length; i++) {
-                if ($("#"+blocks[i]).length > 0) {
-                    $("#output").children().eq(j).before($("#"+blocks[i]));
+                if ($("#" + blocks[i]).length > 0) {
+                    $("#output").children().eq(j).before($("#" + blocks[i]));
                     j++;
                 }
             }
@@ -1667,12 +1677,12 @@ $(document).ready(function buildpage() {
 
     if ($("#language option").length < 2) {
         current_language = $("#language").val().toString();
-/*
-        changeLanguage();
-        for (i = 0; i < plugin_liste.length; i++) {
-            changeLanguage(plugin_liste[i]);
-        }
-*/
+        /*
+                changeLanguage();
+                for (i = 0; i < plugin_liste.length; i++) {
+                    changeLanguage(plugin_liste[i]);
+                }
+        */
     } else {
         cookie_language = readCookie("psi_language");
         if (cookie_language !== null) {
@@ -1681,12 +1691,12 @@ $(document).ready(function buildpage() {
         } else {
             current_language = $("#language").val().toString();
         }
-/*
-        changeLanguage();
-        for (i = 0; i < plugin_liste.length; i++) {
-            changeLanguage(plugin_liste[i]);
-        }
-*/
+        /*
+                changeLanguage();
+                for (i = 0; i < plugin_liste.length; i++) {
+                    changeLanguage(plugin_liste[i]);
+                }
+        */
         $('#language').show();
         $('span[id=lang_045]').show();
         $("#language").change(function changeLang() {
@@ -1786,7 +1796,8 @@ function plugin_translate(plugin) {
  * @return {String} formatted datetime string
  */
 function datetime() {
-    var date, day = 0, month = 0, year = 0, hour = 0, minute = 0, days = "", months = "", years = "", hours = "", minutes = "";
+    var date, day = 0, month = 0, year = 0, hour = 0, minute = 0, days = "", months = "", years = "", hours = "",
+        minutes = "";
     date = new Date();
     day = date.getDate();
     month = date.getMonth() + 1;
@@ -1804,7 +1815,7 @@ function datetime() {
     return days + "." + months + "." + years + " - " + hours + ":" + minutes;
 }
 
-Array.prototype.pushIfNotExist = function(val) {
+Array.prototype.pushIfNotExist = function (val) {
     if (typeof(val) == 'undefined' || val == '') {
         return;
     }
